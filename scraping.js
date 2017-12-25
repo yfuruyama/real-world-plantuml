@@ -11,7 +11,7 @@ async function scrape() {
   var page = 1;
 
   while (true) {
-    let url = 'https://github.com/search?utf8=✓&type=Code&q=' + encodeURIComponent(searchWord) + '&page=' + page;
+    let url = 'https://github.com/search?utf8=✓&type=Code&q=' + encodeURIComponent(searchWord) + '&p=' + page;
     console.error('scrape url:' + url);
     await chromy.goto(url);
 
@@ -23,6 +23,9 @@ async function scrape() {
     });
 
     let hasNext = await chromy.evaluate(() => {
+      if (document.getElementsByClassName('next_page').length == 0) {
+        return false;
+      }
       return document.getElementsByClassName('next_page disabled').length == 0 ? true : false;
     });
     if (!hasNext) {
@@ -36,9 +39,11 @@ async function scrape() {
     await new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve();
-      }, 1000);
+      }, 10000);
     });
   }
+
+  await chromy.close();
 }
 
 scrape();
