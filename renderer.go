@@ -62,7 +62,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to request to PlantUML server: err=%s", err)
 		}
-		defer resp.Body.Close()
+		resp.Body.Close()
 
 		locationUrl, err := resp.Location()
 		if err != nil {
@@ -83,21 +83,21 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to request to PlantUML server: err=%s", err)
 		}
-		defer resp.Body.Close()
 		svg, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
+		resp.Body.Close()
 
-		file, err := os.Create(c.Sha + ".svg")
+		file, err := os.Create("svg/" + c.Sha + ".svg")
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer file.Close()
 
-		n, err := file.Write(svg)
+		_, err = file.Write(svg)
 		if err != nil {
 			log.Fatal(err)
 		}
+		file.Close()
 	}
 }
