@@ -1,22 +1,22 @@
 package main
 
 import (
-	"net/http"
-	"encoding/json"
-	"encoding/base64"
 	"bufio"
-	"os"
-	"log"
+	"encoding/base64"
+	"encoding/json"
 	"flag"
-	"net/url"
 	"fmt"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
 	"strings"
 	// "regexp"
 	"io/ioutil"
 )
 
 type GitHubContent struct {
-	Sha string `json:sha`
+	Sha     string `json:sha`
 	Content string `json:content`
 }
 
@@ -44,10 +44,10 @@ func main() {
 
 		baseUrl := fmt.Sprintf("http://localhost:%d", port)
 		// log.Println(baseUrl)
-		
+
 		values := url.Values{}
 		values.Add("text", uml)
-		req, err := http.NewRequest("POST", baseUrl + "/form", strings.NewReader(values.Encode())) 
+		req, err := http.NewRequest("POST", baseUrl+"/form", strings.NewReader(values.Encode()))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -72,9 +72,9 @@ func main() {
 		umlId := strings.TrimPrefix(locationUrl.Path, "/uml/")
 		log.Println(umlId)
 
-		// access to "GET /txt/{id}" and check the word "Syntax Error?"
+		// access to "GET /check/{id}" and check the word "(Error)", 7 words
 
-		req, err = http.NewRequest("GET", baseUrl + "/svg/" + umlId, nil)
+		req, err = http.NewRequest("GET", baseUrl+"/svg/"+umlId, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
