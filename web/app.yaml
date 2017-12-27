@@ -1,0 +1,9 @@
+runtime: go
+api_version: go1
+instance_class: F1
+service: default
+automatic_scaling:
+
+handlers:
+- url: /.*
+  script: _go_app
