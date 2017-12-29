@@ -79,33 +79,43 @@ func init() {
 
 		log.Infof(ctx, "Get content response: %#v", ghcResp)
 
-		indexer, err := NewIndexer(owner, repo, hash, ghcResp)
+		rendererScheme := os.Getenv("RENDERER_SCHEME")
+		rendererHost := os.Getenv("RENDERER_HOST")
+		rendererPort, _ := strconv.Atoi(os.Getenv("RENDERER_PORT"))
+
+		renderer := NewRenderer(ctx, rendererScheme, rendererHost, rendererPort)
+
+		indexer, err := NewIndexer(ctx, renderer, owner, repo, hash, ghcResp)
 		if err != nil {
 			log.Criticalf(ctx, "Failed to create indexer: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		log.Debugf(ctx, "%#v", indexer)
-		log.Debugf(ctx, "%#v", indexer.FindSources())
 
-		rendererScheme := os.Getenv("RENDERER_SCHEME")
-		rendererHost := os.Getenv("RENDERER_HOST")
-		rendererPort, _ := strconv.Atoi(os.Getenv("RENDERER_PORT"))
-		source := indexer.FindSources()[0]
-		renderer, err := NewRenderer(ctx, rendererScheme, rendererHost, rendererPort, source)
-		if err != nil {
-			log.Criticalf(ctx, "Failed to create renderer: %s", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		svg, err := renderer.RenderSvg()
+		err = indexer.Process()
 		if err != nil {
 			log.Criticalf(ctx, "%s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		log.Debugf(ctx, "%s", svg)
+		// log.Debugf(ctx, "%#v", indexer)
+		// log.Debugf(ctx, "%#v", indexer.FindSources())
+
+		// source := indexer.FindSources()[0]
+		// renderer, err := NewRenderer(ctx, rendererScheme, rendererHost, rendererPort, source)
+		// if err != nil {
+		// log.Criticalf(ctx, "Failed to create renderer: %s", err)
+		// w.WriteHeader(http.StatusInternalServerError)
+		// return
+		// }
+
+		// svg, err := renderer.RenderSvg()
+		// if err != nil {
+		// log.Criticalf(ctx, "%s", err)
+		// w.WriteHeader(http.StatusInternalServerError)
+		// return
+		// }
+		// log.Debugf(ctx, "%s", svg)
 
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "ok")
