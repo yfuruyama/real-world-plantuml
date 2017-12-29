@@ -6,36 +6,13 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/urlfetch"
 )
-
-type DiagramType string
-
-const (
-	TypeSequence  DiagramType = "sequence"
-	TypeUsecase   DiagramType = "usecase"
-	TypeClass     DiagramType = "class"
-	TypeActivity  DiagramType = "activity"
-	TypeComponent DiagramType = "component"
-	TypeState     DiagramType = "state"
-	TypeObject    DiagramType = "object"
-	TypeUnknwon   DiagramType = "__unknown__"
-)
-
-// func guessDiagramType(source string) DiagramType {
-
-// (N participants) => sequence
-// (N entities) => usecase
-// (N entities) => class
-// (N activities) => activity
-// (N entities) => component
-// (N entities) => state
-// (N entities) => object
-// }
 
 type IndexCreateRequestBody struct {
 	Url string `json:url`
@@ -93,14 +70,42 @@ func init() {
 		defer resp.Body.Close()
 
 		decoder = json.NewDecoder(resp.Body)
-		var content GitHubContentResponse
-		if err := decoder.Decode(&content); err != nil {
-			log.Criticalf(ctx, "Failed to parse content: %s", err)
+		var ghcResp GitHubContentResponse
+		if err := decoder.Decode(&ghcResp); err != nil {
+			log.Criticalf(ctx, "Failed to parse response: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		log.Infof(ctx, "Get content: %#v", content)
+		log.Infof(ctx, "Get content response: %#v", ghcResp)
+
+		indexer, err := NewIndexer(owner, repo, hash, ghcResp)
+		if err != nil {
+			log.Criticalf(ctx, "Failed to create indexer: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		log.Debugf(ctx, "%#v", indexer)
+		log.Debugf(ctx, "%#v", indexer.FindSources())
+
+		rendererScheme := os.Getenv("RENDERER_SCHEME")
+		rendererHost := os.Getenv("RENDERER_HOST")
+		rendererPort, _ := strconv.Atoi(os.Getenv("RENDERER_PORT"))
+		source := indexer.FindSources()[0]
+		renderer, err := NewRenderer(ctx, rendererScheme, rendererHost, rendererPort, source)
+		if err != nil {
+			log.Criticalf(ctx, "Failed to create renderer: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		svg, err := renderer.RenderSvg()
+		if err != nil {
+			log.Criticalf(ctx, "%s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		log.Debugf(ctx, "%s", svg)
 
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "ok")
