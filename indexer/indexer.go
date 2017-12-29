@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
 )
 
@@ -16,12 +17,13 @@ type Indexer struct {
 }
 
 type Uml struct {
-	Source string
-	Type   DiagramType
-	Svg    string
-	Ascii  string
-	Check  string
-	ref    GitHubReference
+	Source      string      `datastore:"source,noindex"`
+	DiagramType DiagramType `datastore:"diagramType"`
+	Svg         string      `datastore:"svg,noindex"`
+	PngBase64   string      `datastore:"pngBase64,noindex"`
+	Ascii       string      `datastore:"ascii,noindex"`
+	// Check  string
+	// ref    GitHubReference
 }
 
 type GitHubReference struct {
@@ -89,18 +91,21 @@ func (idxr *Indexer) FindSources() []string {
 }
 
 func (idxr *Indexer) Process() error {
+	cxt := idxr.cxt
 	sources := idxr.FindSources()
 	renderer := idxr.Renderer
 
 	for _, source := range sources {
+		log.Infof(cxt, "process source: %s", source)
+
 		checked, err := renderer.CheckSyntax(source)
 		if err != nil {
-			log.Criticalf(idxr.cxt, "failed to check syntax: %s", err)
+			log.Criticalf(cxt, "failed to check syntax: %s", err)
 			return err
 		}
 
 		if checked == "(Error)" {
-			log.Infof(idxr.cxt, "invalid syntax: %s", source)
+			log.Infof(cxt, "invalid syntax: %s", source)
 			continue
 		}
 
@@ -108,26 +113,39 @@ func (idxr *Indexer) Process() error {
 
 		svg, err := renderer.RenderSvg(source)
 		if err != nil {
-			log.Criticalf(idxr.cxt, "failed to render svg: %s", err)
+			log.Criticalf(cxt, "failed to render svg: %s", err)
 			return err
 		}
 
 		png, err := renderer.RenderPng(source)
 		if err != nil {
-			log.Criticalf(idxr.cxt, "failed to render png: %s", err)
+			log.Criticalf(cxt, "failed to render png: %s", err)
 			return err
 		}
 		pngBase64 := base64.StdEncoding.EncodeToString(png)
 
 		ascii, err := renderer.RenderAscii(source)
 		if err != nil {
-			log.Criticalf(idxr.cxt, "failed to render ascii: %s", err)
+			log.Criticalf(cxt, "failed to render ascii: %s", err)
 			return err
 		}
 
-		log.Infof(idxr.cxt, "make index: type=%s, svg=%s, pngBase64=%s, ascii=%s", typ, svg, pngBase64, ascii)
+		log.Infof(cxt, "make index: type=%s, svg=%s, pngBase64=%s, ascii=%s", typ, svg, pngBase64, ascii)
 
-		// TODO: save to Datastore
+		uml := &Uml{
+			Source:      source,
+			DiagramType: typ,
+			Svg:         svg,
+			PngBase64:   pngBase64,
+			Ascii:       ascii,
+		}
+
+		key := datastore.NewIncompleteKey(cxt, "Uml", nil)
+		key, err = datastore.Put(cxt, key, uml)
+		if err != nil {
+			log.Criticalf(cxt, "put error: %s", err)
+			return err
+		}
 	}
 
 	return nil
