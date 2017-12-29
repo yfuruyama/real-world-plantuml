@@ -1,2 +1,4 @@
 .DS_Store
 web/vendor
+
+scraping/node_modules
