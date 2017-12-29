@@ -3,6 +3,7 @@ package web
 import (
 	"html/template"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"google.golang.org/appengine"
@@ -34,12 +35,6 @@ const (
 )
 
 func init() {
-	tmpl := template.Must(template.New("").Funcs(template.FuncMap{
-		"safehtml": func(text string) template.HTML {
-			return template.HTML(text)
-		},
-	}).ParseFiles("templates/index.html"))
-
 	router := chi.NewRouter()
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		ctx := appengine.NewContext(r)
@@ -47,6 +42,16 @@ func init() {
 		var umls []Uml
 		q := datastore.NewQuery("Uml")
 		_, err := q.GetAll(ctx, &umls)
+
+		// TODO: マークアップが安定してきたら外に出す
+		tmpl := template.Must(template.New("").Funcs(template.FuncMap{
+			"safehtml": func(text string) template.HTML {
+				return template.HTML(text)
+			},
+			"loopLineTimes": func(text string) []struct{} {
+				return make([]struct{}, strings.Count(text, "\n")+1)
+			},
+		}).ParseFiles("templates/index.html"))
 
 		err = tmpl.ExecuteTemplate(w, "index.html", struct {
 			Umls []Uml
