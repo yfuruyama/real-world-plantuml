@@ -1,0 +1,8 @@
+runtime: custom
+env: flex
+service: renderer
+network:
+  forwarded_ports:
+    - 80:8080
+manual_scaling:
+  instances: 1
