@@ -5,5 +5,9 @@ service: indexer
 automatic_scaling:
 
 handlers:
+- url: /_ah/push-handlers/*
+  script: _go_app
+  login: admin
+    
 - url: /.*
   script: _go_app

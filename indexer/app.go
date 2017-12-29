@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strconv"
 
+	"handlers"
+
 	"github.com/go-chi/chi"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
@@ -98,32 +100,12 @@ func init() {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		// log.Debugf(ctx, "%#v", indexer)
-		// log.Debugf(ctx, "%#v", indexer.FindSources())
-
-		// source := indexer.FindSources()[0]
-		// renderer, err := NewRenderer(ctx, rendererScheme, rendererHost, rendererPort, source)
-		// if err != nil {
-		// log.Criticalf(ctx, "Failed to create renderer: %s", err)
-		// w.WriteHeader(http.StatusInternalServerError)
-		// return
-		// }
-
-		// svg, err := renderer.RenderSvg()
-		// if err != nil {
-		// log.Criticalf(ctx, "%s", err)
-		// w.WriteHeader(http.StatusInternalServerError)
-		// return
-		// }
-		// log.Debugf(ctx, "%s", svg)
 
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "ok")
 	})
 
-	// router.Post("/indexer/callback", func(w http.ResponseWriter, r *http.Request) {
-	// fmt.Fprint(w, "hello")
-	// })
+	router.Post("/_ah/push-handlers/gcs_notification", handlers.HandleGcsNotification)
 
 	http.Handle("/", router)
 }
