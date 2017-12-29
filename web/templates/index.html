@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Real World PlantUML</title>
+  <link rel="stylesheet" href="https://unpkg.com/material-components-web@0.27.0/dist/material-components-web.css">
+  <script type="text/javascript" src="https://unpkg.com/material-components-web@0.27.0/dist/material-components-web.js"></script>
+</head>
+<body class="mdc-typography">
+<header class="mdc-toolbar mdc-toolbar--fixed">
+  <div class="mdc-toolbar__row">
+    <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+      <span class="mdc-toolbar__title">Real World PlantUML</span>
+    </section>
+  </div>
+</header>
+
+<main id="app" class="mdc-toolbar-fixed-adjust">
+  <div class="container">
+    {{ range $i, $uml := .Umls }}
+    <div>
+      {{ $uml.Svg | safehtml }}
+    </div>
+    {{ end }}
+  </div>
+</main>
+
+</body>
+</html>
