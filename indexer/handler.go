@@ -1,4 +1,4 @@
-package handlers
+package indexer
 
 import (
 	"bufio"
@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"indexer"
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/appengine"
@@ -89,7 +87,7 @@ func HandleGcsNotification(w http.ResponseWriter, r *http.Request) {
 		header := make(http.Header)
 		header.Set("Content-Type", "application/json")
 
-		body := &indexer.IndexCreateRequestBody{
+		body := &IndexCreateRequestBody{
 			Url: line,
 		}
 		bodyBytes, err := json.Marshal(body)
@@ -103,7 +101,7 @@ func HandleGcsNotification(w http.ResponseWriter, r *http.Request) {
 			Payload: bodyBytes,
 			Header:  header,
 			Method:  "POST",
-			Delay:   time.Second * i,
+			Delay:   time.Second * time.Duration(i),
 		}
 		taskqueue.Add(ctx, task, "index-create-queue")
 

@@ -8,8 +8,6 @@ import (
 	"regexp"
 	"strconv"
 
-	"handlers"
-
 	"github.com/go-chi/chi"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
@@ -105,7 +103,7 @@ func init() {
 		fmt.Fprintf(w, "ok")
 	})
 
-	router.Post("/_ah/push-handlers/gcs_notification", handlers.HandleGcsNotification)
+	router.Post("/_ah/push-handlers/gcs_notification", HandleGcsNotification)
 
 	http.Handle("/", router)
 }
