@@ -1,0 +1,3 @@
+https://github.com/jvantuyl/sublime_diagram_plugin/blob/0c760748036322df29857f3c3574b67a63175672/diagram/test.txt
+https://github.com/alexdruzhilov/configuration/blob/5e5ae08d6f77b4162012860684beefab793d3fae/sublime-text-2/Packages/Diagram/diagram/test.txt
+https://github.com/jmbruel/UPSTI/blob/f8b25a0b350bc16406476f72382113b34091ba70/plantuml/uc5.txt

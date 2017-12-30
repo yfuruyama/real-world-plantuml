@@ -1,0 +1,4 @@
+queue:
+  - name: index-create-queue
+    target: indexer
+    rate: 10/s

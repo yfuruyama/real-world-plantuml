@@ -1,15 +1,19 @@
 package handlers
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"time"
+
+	"indexer"
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/file"
 	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/taskqueue"
 )
 
 type PubSubSubscription struct {
@@ -76,14 +80,35 @@ func HandleGcsNotification(w http.ResponseWriter, r *http.Request) {
 	}
 	defer reader.Close()
 
-	slurp, err := ioutil.ReadAll(reader)
-	if err != nil {
-		log.Criticalf(ctx, "unable to read file content from bucket %v, object %v: %v", bucketName, objectId, err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	i := 0
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		line := scanner.Text()
+		log.Infof(ctx, "Read line: %s", line)
 
-	log.Infof(ctx, "GCS object content: %s", string(slurp))
+		header := make(http.Header)
+		header.Set("Content-Type", "application/json")
+
+		body := &indexer.IndexCreateRequestBody{
+			Url: line,
+		}
+		bodyBytes, err := json.Marshal(body)
+		if err != nil {
+			log.Criticalf(ctx, "json marshal error: %s", err)
+			continue
+		}
+
+		task := &taskqueue.Task{
+			Path:    "/indexer/create",
+			Payload: bodyBytes,
+			Header:  header,
+			Method:  "POST",
+			Delay:   time.Second * i,
+		}
+		taskqueue.Add(ctx, task, "index-create-queue")
+
+		i++
+	}
 
 	fmt.Fprintf(w, "ok")
 }
