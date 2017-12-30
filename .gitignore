@@ -2,3 +2,9 @@
 web/vendor
 
 scraping/node_modules
+
+# syntaxchecker
+syntaxchecker/build
+.gradle
+.idea
+!gradle-wrapper.jar
