@@ -2,7 +2,6 @@ package indexer
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -17,8 +16,7 @@ type Renderer struct {
 	ctx     context.Context
 }
 
-func NewRenderer(ctx context.Context, scheme, host string, port int) *Renderer {
-	baseUrl := fmt.Sprintf("%s://%s:%d", scheme, host, port)
+func NewRenderer(ctx context.Context, baseUrl string) *Renderer {
 	return &Renderer{
 		BaseUrl: baseUrl,
 		ctx:     ctx,
@@ -58,19 +56,6 @@ func (r *Renderer) RenderAscii(source string) (string, error) {
 		return "", err
 	}
 	return string(asciiBytes), err
-}
-
-func (r *Renderer) CheckSyntax(source string) (string, error) {
-	umlId, err := r.getUmlId(source)
-	if err != nil {
-		return "", err
-	}
-
-	checkedBytes, err := r.doRequest("/check/" + umlId)
-	if err != nil {
-		return "", err
-	}
-	return string(checkedBytes), err
 }
 
 func (r *Renderer) getUmlId(source string) (string, error) {

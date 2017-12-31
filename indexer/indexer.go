@@ -11,9 +11,10 @@ import (
 )
 
 type Indexer struct {
-	Content  string
-	Renderer *Renderer
-	cxt      context.Context
+	Content       string
+	Renderer      *Renderer
+	SyntaxChecker *SyntaxChecker
+	ctx           context.Context
 }
 
 type Uml struct {
@@ -45,19 +46,26 @@ const (
 	TypeUnknwon   DiagramType = "__unknown__"
 )
 
-func guessDiagramType(source, checked string) DiagramType {
-
-	// (N participants) => sequence
-	// (N entities) => usecase
-	// (N entities) => class
-	// (N activities) => activity
-	// (N entities) => component
-	// (N entities) => state
-	// (N entities) => object
-	return TypeUnknwon
+func guessDiagramType(source string, result *SyntaxCheckResult) DiagramType {
+	switch result.DiagramType {
+	case "SEQUENCE":
+		return TypeSequence
+	case "DESCRIPTION":
+		return TypeComponent
+	case "CLASS":
+		return TypeClass
+	case "ACTIVITY":
+		return TypeActivity
+	case "STATE":
+		return TypeState
+	case "Object":
+		return TypeObject
+	default:
+		return TypeUnknwon
+	}
 }
 
-func NewIndexer(cxt context.Context, renderer *Renderer, owner, repo, hash string, resp GitHubContentResponse) (*Indexer, error) {
+func NewIndexer(ctx context.Context, renderer *Renderer, syntaxChecker *SyntaxChecker, owner, repo, hash string, resp GitHubContentResponse) (*Indexer, error) {
 	contentBytes, err := base64.StdEncoding.DecodeString(resp.Content)
 	if err != nil {
 		return nil, err
@@ -65,9 +73,10 @@ func NewIndexer(cxt context.Context, renderer *Renderer, owner, repo, hash strin
 
 	content := string(contentBytes)
 	return &Indexer{
-		Content:  content,
-		Renderer: renderer,
-		cxt:      cxt,
+		Content:       content,
+		Renderer:      renderer,
+		SyntaxChecker: syntaxChecker,
+		ctx:           ctx,
 	}, nil
 }
 
@@ -91,46 +100,46 @@ func (idxr *Indexer) FindSources() []string {
 }
 
 func (idxr *Indexer) Process() error {
-	cxt := idxr.cxt
+	ctx := idxr.ctx
 	sources := idxr.FindSources()
 	renderer := idxr.Renderer
+	syntaxChecker := idxr.SyntaxChecker
 
 	for _, source := range sources {
-		log.Infof(cxt, "process source: %s", source)
+		log.Infof(ctx, "process source: %s", source)
 
-		checked, err := renderer.CheckSyntax(source)
+		result, err := syntaxChecker.CheckSyntax(source)
 		if err != nil {
-			log.Criticalf(cxt, "failed to check syntax: %s", err)
+			log.Criticalf(ctx, "failed to check syntax: %s", err)
 			return err
 		}
-
-		if checked == "(Error)" {
-			log.Infof(cxt, "invalid syntax: %s", source)
+		if !result.Valid {
+			log.Infof(ctx, "invalid syntax: %s", source)
 			continue
 		}
 
-		typ := guessDiagramType(source, checked)
+		typ := guessDiagramType(source, result)
 
 		svg, err := renderer.RenderSvg(source)
 		if err != nil {
-			log.Criticalf(cxt, "failed to render svg: %s", err)
+			log.Criticalf(ctx, "failed to render svg: %s", err)
 			return err
 		}
 
 		png, err := renderer.RenderPng(source)
 		if err != nil {
-			log.Criticalf(cxt, "failed to render png: %s", err)
+			log.Criticalf(ctx, "failed to render png: %s", err)
 			return err
 		}
 		pngBase64 := base64.StdEncoding.EncodeToString(png)
 
 		ascii, err := renderer.RenderAscii(source)
 		if err != nil {
-			log.Criticalf(cxt, "failed to render ascii: %s", err)
+			log.Criticalf(ctx, "failed to render ascii: %s", err)
 			return err
 		}
 
-		log.Infof(cxt, "make index: type=%s, svg=%s, pngBase64=%s, ascii=%s", typ, svg, pngBase64, ascii)
+		log.Infof(ctx, "make index: type=%s, svg=%s, pngBase64=%s, ascii=%s", typ, svg, pngBase64, ascii)
 
 		uml := &Uml{
 			Source:      source,
@@ -140,10 +149,10 @@ func (idxr *Indexer) Process() error {
 			Ascii:       ascii,
 		}
 
-		key := datastore.NewIncompleteKey(cxt, "Uml", nil)
-		key, err = datastore.Put(cxt, key, uml)
+		key := datastore.NewIncompleteKey(ctx, "Uml", nil)
+		key, err = datastore.Put(ctx, key, uml)
 		if err != nil {
-			log.Criticalf(cxt, "put error: %s", err)
+			log.Criticalf(ctx, "put error: %s", err)
 			return err
 		}
 	}

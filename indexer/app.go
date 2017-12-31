@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
 
 	"github.com/go-chi/chi"
 	"google.golang.org/appengine"
@@ -15,13 +14,13 @@ import (
 )
 
 type IndexCreateRequestBody struct {
-	Url string `json:url`
+	Url string `json:"url"`
 }
 
 type GitHubContentResponse struct {
-	Path    string `json:path`
-	Sha     string `json:sha`
-	Content string `json:content`
+	Path    string `json:"path"`
+	Sha     string `json:"sha"`
+	Content string `json:"content"`
 }
 
 func init() {
@@ -79,13 +78,13 @@ func init() {
 
 		log.Infof(ctx, "Get content response: %#v", ghcResp)
 
-		rendererScheme := os.Getenv("RENDERER_SCHEME")
-		rendererHost := os.Getenv("RENDERER_HOST")
-		rendererPort, _ := strconv.Atoi(os.Getenv("RENDERER_PORT"))
+		rendererBaseUrl := os.Getenv("RENDERER_BASE_URL")
+		renderer := NewRenderer(ctx, rendererBaseUrl)
 
-		renderer := NewRenderer(ctx, rendererScheme, rendererHost, rendererPort)
+		syntaxCheckerBaseUrl := os.Getenv("SYNTAX_CHECKER_BASE_URL")
+		syntaxChecker := NewSyntaxChecker(ctx, syntaxCheckerBaseUrl)
 
-		indexer, err := NewIndexer(ctx, renderer, owner, repo, hash, ghcResp)
+		indexer, err := NewIndexer(ctx, renderer, syntaxChecker, owner, repo, hash, ghcResp)
 		if err != nil {
 			log.Criticalf(ctx, "Failed to create indexer: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)

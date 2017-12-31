@@ -16,7 +16,7 @@ import javax.ws.rs.ext.ContextResolver
 import javax.ws.rs.ext.Provider
 
 fun main(args: Array<String>) {
-    val port = 8080
+    val port = 8087
     println("Starts server: port=%d".format(port))
 
     val baseUri = UriBuilder.fromUri("http://localhost/").port(port).build()
