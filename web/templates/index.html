@@ -123,6 +123,7 @@
     <div class="container">
       {{ range $i, $uml := .Umls }}
       <div class="uml">
+        <div class="uml__ref"><a href="{{ $uml.GitHubUrl }}">{{ $uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
         <div class="uml__svg">{{ $uml.DiagramType }}</div>
         <div class="uml__svg">{{ $uml.Svg | safehtml }}</div>
         <div class="uml__source">

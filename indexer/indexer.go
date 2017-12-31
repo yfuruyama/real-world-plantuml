@@ -11,6 +11,7 @@ import (
 )
 
 type Indexer struct {
+	GitHubUrl     string
 	Content       string
 	Renderer      *Renderer
 	SyntaxChecker *SyntaxChecker
@@ -18,19 +19,12 @@ type Indexer struct {
 }
 
 type Uml struct {
+	GitHubUrl   string      `datastore:"gitHubUrl"`
 	Source      string      `datastore:"source,noindex"`
 	DiagramType DiagramType `datastore:"diagramType"`
 	Svg         string      `datastore:"svg,noindex"`
 	PngBase64   string      `datastore:"pngBase64,noindex"`
 	Ascii       string      `datastore:"ascii,noindex"`
-	// Check  string
-	// ref    GitHubReference
-}
-
-type GitHubReference struct {
-	Owner string
-	Repo  string
-	Path  string
 }
 
 type DiagramType string
@@ -65,17 +59,12 @@ func guessDiagramType(source string, result *SyntaxCheckResult) DiagramType {
 	}
 }
 
-func NewIndexer(ctx context.Context, renderer *Renderer, syntaxChecker *SyntaxChecker, owner, repo, hash string, resp GitHubContentResponse) (*Indexer, error) {
-	contentBytes, err := base64.StdEncoding.DecodeString(resp.Content)
-	if err != nil {
-		return nil, err
-	}
-
-	content := string(contentBytes)
+func NewIndexer(ctx context.Context, renderer *Renderer, syntaxChecker *SyntaxChecker, gitHubUrl string, content string) (*Indexer, error) {
 	return &Indexer{
 		Content:       content,
 		Renderer:      renderer,
 		SyntaxChecker: syntaxChecker,
+		GitHubUrl:     gitHubUrl,
 		ctx:           ctx,
 	}, nil
 }
@@ -140,8 +129,8 @@ func (idxr *Indexer) Process() error {
 		}
 
 		log.Infof(ctx, "make index: type=%s, svg=%s, pngBase64=%s, ascii=%s", typ, svg, pngBase64, ascii)
-
 		uml := &Uml{
+			GitHubUrl:   idxr.GitHubUrl,
 			Source:      source,
 			DiagramType: typ,
 			Svg:         svg,

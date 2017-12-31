@@ -9,7 +9,7 @@ test:
 	echo "TBD"
 
 run:
-	dev_appserver.py --port=$(PORT) --api_port=$(API_PORT) --admin_port=$(ADMIN_PORT) app.yaml
+	dev_appserver.py --logs_path=/tmp/log.db --port=$(PORT) --api_port=$(API_PORT) --admin_port=$(ADMIN_PORT) app.yaml
 
 deploy:
 	gcloud --project=${PROJECT} app deploy

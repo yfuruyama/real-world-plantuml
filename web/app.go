@@ -1,8 +1,10 @@
 package web
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/go-chi/chi"
@@ -13,13 +15,12 @@ import (
 
 // TODO: indexer と共有する
 type Uml struct {
+	GitHubUrl   string      `datastore:"gitHubUrl"`
 	Source      string      `datastore:"source,noindex"`
 	DiagramType DiagramType `datastore:"diagramType"`
 	Svg         string      `datastore:"svg,noindex"`
 	PngBase64   string      `datastore:"pngBase64,noindex"`
 	Ascii       string      `datastore:"ascii,noindex"`
-	// Check  string
-	// ref    GitHubReference
 }
 type DiagramType string
 
@@ -56,6 +57,20 @@ func init() {
 			},
 			"loopLineTimes": func(text string) []struct{} {
 				return make([]struct{}, strings.Count(text, "\n")+1)
+			},
+			"githubUrlToAnchorText": func(url string) string {
+				re := regexp.MustCompile(`^https://github.com/([^/]+)/([^/]+)/(.+)/(.+)$`)
+				matched := re.FindStringSubmatch(url)
+				if len(matched) != 5 {
+					log.Warningf(ctx, "invalid github url: %s", url)
+					return ""
+				}
+
+				owner := matched[1]
+				repo := matched[2]
+				_ = matched[3]
+				file := matched[4]
+				return fmt.Sprintf("%s/%s - %s", owner, repo, file)
 			},
 		}).ParseFiles("templates/index.html"))
 

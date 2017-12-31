@@ -1,6 +1,7 @@
 package indexer
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -77,6 +78,13 @@ func init() {
 		}
 
 		log.Infof(ctx, "Get content response: %#v", ghcResp)
+		contentBytes, err := base64.StdEncoding.DecodeString(ghcResp.Content)
+		if err != nil {
+			log.Criticalf(ctx, "Failed to parse GitHub content: err=%s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		content := string(contentBytes)
 
 		rendererBaseUrl := os.Getenv("RENDERER_BASE_URL")
 		renderer := NewRenderer(ctx, rendererBaseUrl)
@@ -84,7 +92,7 @@ func init() {
 		syntaxCheckerBaseUrl := os.Getenv("SYNTAX_CHECKER_BASE_URL")
 		syntaxChecker := NewSyntaxChecker(ctx, syntaxCheckerBaseUrl)
 
-		indexer, err := NewIndexer(ctx, renderer, syntaxChecker, owner, repo, hash, ghcResp)
+		indexer, err := NewIndexer(ctx, renderer, syntaxChecker, body.Url, content)
 		if err != nil {
 			log.Criticalf(ctx, "Failed to create indexer: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
