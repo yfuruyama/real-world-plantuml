@@ -1,5 +1,6 @@
 package com.yfuruyama.syntaxchecker
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -7,6 +8,7 @@ import net.sourceforge.plantuml.syntax.SyntaxChecker
 import org.glassfish.jersey.jackson.JacksonFeature
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory
 import org.glassfish.jersey.server.ResourceConfig
+import java.util.logging.Logger
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.UriBuilder
@@ -40,22 +42,32 @@ class ObjectMapperProvider : ContextResolver<ObjectMapper> {
     override fun getContext(type: Class<*>?): ObjectMapper? = objectMapper
 }
 
-data class CheckSyntaxRequest(val source: String)
-data class CheckSyntaxResponse(val valid: Boolean, val diagramType: String)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class CheckSyntaxRequest(val source: String?)
+
+data class CheckSyntaxResponse(val valid: Boolean, val diagramType: String, val description: String)
 
 @Path("check_syntax")
 class CheckSyntaxResource {
+    var logger = Logger.getLogger(CheckSyntaxResource::class.java.name)
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     fun checkSyntax(req: CheckSyntaxRequest): CheckSyntaxResponse {
-        // TODO: body check
-        println("Get source %s".format(req.source))
-        val result = SyntaxChecker.checkSyntax(req.source)
-        // TODO: log
-        println("Syntax check result: %s".format(result))
+        if (req.source == null) {
+            throw BadRequestException("`source` not specified")
+        }
 
-        // TODO: UNKNOWN diagram type
-        return CheckSyntaxResponse(!result.isError, result.umlDiagramType.name)
+        logger.info("Get source %s".format(req.source))
+        val result = SyntaxChecker.checkSyntax(req.source)
+
+        if (result.isError || result.umlDiagramType == null) {
+            logger.info("Invalid syntax: errors=%s".format(result.errors.joinToString(",")))
+            return CheckSyntaxResponse(false, "", "")
+        } else {
+            logger.info("Valid syntax: diagramType=%s, description=%s".format(result.umlDiagramType, result.description))
+            return CheckSyntaxResponse(true, result.umlDiagramType.name, result.description)
+        }
     }
 }
