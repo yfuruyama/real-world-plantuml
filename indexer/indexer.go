@@ -47,7 +47,7 @@ func guessDiagramType(source string, result *SyntaxCheckResult) DiagramType {
 	case "DESCRIPTION":
 		// Both of Usecase and Component diagram's syntax check result are "DESCRIPTION",
 		// so distinct them ad hoc
-		if strings.Contains(source, "actor") {
+		if strings.Contains(source, "actor") || strings.Contains(source, "usecase") {
 			return TypeUsecase
 		} else {
 			return TypeComponent

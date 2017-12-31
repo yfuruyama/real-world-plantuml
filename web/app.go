@@ -113,9 +113,11 @@ func init() {
 		err := tmpl.ExecuteTemplate(w, "index.html", struct {
 			Umls       []Uml
 			NextCursor string
+			Type       DiagramType
 		}{
 			umls,
 			nextCursor,
+			typ,
 		})
 		if err != nil {
 			log.Criticalf(ctx, "%s", err)
