@@ -90,15 +90,30 @@
   <nav class="mdc-permanent-drawer mdc-typography">
     <div class="mdc-list-group">
       <nav id="icon-with-text-demo" class="mdc-list">
-        <a class="mdc-list-item mdc-permanent-drawer--selected" href="#">
+        <a class="mdc-list-item mdc-permanent-drawer--selected" href="/">
           <!-- <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">inbox</i>Inbox -->
           ALL
         </a>
-        <a class="mdc-list-item" href="#">
+        <a class="mdc-list-item" href="/?type=sequence">
           Sequence
         </a>
-        <a class="mdc-list-item" href="#">
+        <a class="mdc-list-item" href="/?type=usecase">
           Usecase
+        </a>
+        <a class="mdc-list-item" href="/?type=class">
+          Class
+        </a>
+        <a class="mdc-list-item" href="/?type=activity">
+          Activity
+        </a>
+        <a class="mdc-list-item" href="/?type=component">
+          Component
+        </a>
+        <a class="mdc-list-item" href="/?type=state">
+          State
+        </a>
+        <a class="mdc-list-item" href="/?type=object">
+          Object
         </a>
       </nav>
     </div>
@@ -108,6 +123,7 @@
     <div class="container">
       {{ range $i, $uml := .Umls }}
       <div class="uml">
+        <div class="uml__svg">{{ $uml.DiagramType }}</div>
         <div class="uml__svg">{{ $uml.Svg | safehtml }}</div>
         <div class="uml__source">
           <pre>{{ $uml.Source }}<span class="uml__source__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>

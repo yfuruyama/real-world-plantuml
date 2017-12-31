@@ -39,8 +39,14 @@ func init() {
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		ctx := appengine.NewContext(r)
 
+		queryParams := r.URL.Query()
+		typ := DiagramType(queryParams.Get("type"))
+
 		var umls []Uml
-		q := datastore.NewQuery("Uml")
+		q := datastore.NewQuery("Uml").Limit(10)
+		if typ == TypeSequence || typ == TypeUsecase || typ == TypeClass || typ == TypeActivity || typ == TypeComponent || typ == TypeState || typ == TypeObject {
+			q = q.Filter("diagramType =", typ)
+		}
 		_, err := q.GetAll(ctx, &umls)
 
 		// TODO: マークアップが安定してきたら外に出す
