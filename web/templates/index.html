@@ -20,6 +20,11 @@
       min-height: 100%;
     }
 
+    .title {
+      text-decoration: inherit;
+      color: inherit;
+    }
+
     /* Place drawer and main next to each other. */
     .content {
       display: flex;
@@ -81,7 +86,7 @@
 <header class="mdc-toolbar mdc-toolbar--fixed">
   <div class="mdc-toolbar__row">
     <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-      <span class="mdc-toolbar__title">Real World PlantUML</span>
+      <span class="mdc-toolbar__title"><a href="/" class="title">Real World PlantUML</a></span>
     </section>
   </div>
 </header>
@@ -130,6 +135,10 @@
           <pre>{{ $uml.Source }}<span class="uml__source__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>
         </div>
       </div>
+      {{ end }}
+
+      {{ if .NextCursor }}
+        <div><a href="/?cursor={{ .NextCursor }}">Next</a></div>
       {{ end }}
     </div>
   </main>

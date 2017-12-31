@@ -45,7 +45,13 @@ func guessDiagramType(source string, result *SyntaxCheckResult) DiagramType {
 	case "SEQUENCE":
 		return TypeSequence
 	case "DESCRIPTION":
-		return TypeComponent
+		// Both of Usecase and Component diagram's syntax check result are "DESCRIPTION",
+		// so distinct them ad hoc
+		if strings.Contains(source, "actor") {
+			return TypeUsecase
+		} else {
+			return TypeComponent
+		}
 	case "CLASS":
 		return TypeClass
 	case "ACTIVITY":
@@ -102,6 +108,8 @@ func (idxr *Indexer) Process() error {
 			log.Criticalf(ctx, "failed to check syntax: %s", err)
 			return err
 		}
+		log.Infof(ctx, "syntax check result: %v", result)
+
 		if !result.Valid {
 			log.Infof(ctx, "invalid syntax: %s", source)
 			continue

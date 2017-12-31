@@ -43,12 +43,48 @@ func init() {
 		queryParams := r.URL.Query()
 		typ := DiagramType(queryParams.Get("type"))
 
-		var umls []Uml
-		q := datastore.NewQuery("Uml").Limit(10)
+		limit := 10
+		q := datastore.NewQuery("Uml").Limit(limit)
+
+		// Set filter
 		if typ == TypeSequence || typ == TypeUsecase || typ == TypeClass || typ == TypeActivity || typ == TypeComponent || typ == TypeState || typ == TypeObject {
 			q = q.Filter("diagramType =", typ)
 		}
-		_, err := q.GetAll(ctx, &umls)
+
+		// Set cursor
+		if cursor := queryParams.Get("cursor"); cursor != "" {
+			decoded, err := datastore.DecodeCursor(cursor)
+			if err == nil {
+				q = q.Start(decoded)
+			}
+		}
+
+		// Do query
+		iter := q.Run(ctx)
+		var umls []Uml
+		for {
+			var uml Uml
+			_, err := iter.Next(&uml)
+			if err == datastore.Done {
+				log.Infof(ctx, "iter done")
+				break
+			}
+			if err != nil {
+				log.Criticalf(ctx, "datastore fetch error: %v", err)
+				break
+			}
+			umls = append(umls, uml)
+		}
+
+		// Get nextCursor
+		var nextCursor string
+		if len(umls) >= limit {
+			dsCursor, err := iter.Cursor()
+			if err == nil {
+				nextCursor = dsCursor.String()
+				log.Infof(ctx, "next cursor: %s", nextCursor)
+			}
+		}
 
 		// TODO: マークアップが安定してきたら外に出す
 		tmpl := template.Must(template.New("").Funcs(template.FuncMap{
@@ -74,10 +110,12 @@ func init() {
 			},
 		}).ParseFiles("templates/index.html"))
 
-		err = tmpl.ExecuteTemplate(w, "index.html", struct {
-			Umls []Uml
+		err := tmpl.ExecuteTemplate(w, "index.html", struct {
+			Umls       []Uml
+			NextCursor string
 		}{
 			umls,
+			nextCursor,
 		})
 		if err != nil {
 			log.Criticalf(ctx, "%s", err)
