@@ -126,21 +126,14 @@
 
   <main>
     <div class="container">
-      {{ range $i, $uml := .Umls }}
       <div class="uml">
-        <div class="uml__id"><a href="/umls/{{ $uml.ID }}">{{ $uml.ID }}</a></div>
-        <div class="uml__ref"><a href="{{ $uml.GitHubUrl }}">{{ $uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
-        <div class="uml__svg">{{ $uml.DiagramType }}</div>
-        <div class="uml__svg">{{ $uml.Svg | safehtml }}</div>
+        <div class="uml__ref"><a href="{{ .Uml.GitHubUrl }}">{{ .Uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
+        <div class="uml__svg">{{ .Uml.DiagramType }}</div>
+        <div class="uml__svg">{{ .Uml.Svg | safehtml }}</div>
         <div class="uml__source">
-          <pre>{{ $uml.Source }}<span class="uml__source__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>
+          <pre>{{ .Uml.Source }}<span class="uml__source__line_numbers">{{ range loopLineTimes .Uml.Source }}<span></span>{{ end }}</span></pre>
         </div>
       </div>
-      {{ end }}
-
-      {{ if .NextCursor }}
-      <div><a href="/?cursor={{ .NextCursor }}{{ if .Type }}&type={{ .Type }}{{ end }}">Next</a></div>
-      {{ end }}
     </div>
   </main>
 </div>
