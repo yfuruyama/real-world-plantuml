@@ -54,7 +54,6 @@ func init() {
 		path := matched[4]
 
 		apiUrl := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", owner, repo, path, hash)
-		log.Infof(ctx, "apiUrl: %s", apiUrl)
 
 		token := os.Getenv("GITHUB_API_TOKEN")
 		req, _ := http.NewRequest("GET", apiUrl, nil)

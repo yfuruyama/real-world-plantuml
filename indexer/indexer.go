@@ -45,7 +45,7 @@ func guessDiagramType(source string, result *SyntaxCheckResult) DiagramType {
 	case "SEQUENCE":
 		return TypeSequence
 	case "DESCRIPTION":
-		// Both of Usecase and Component diagram's syntax check result are "DESCRIPTION",
+		// Both of Usecase and Component diagram's syntax check results are "DESCRIPTION",
 		// so distinct them ad hoc
 		if strings.Contains(source, "actor") || strings.Contains(source, "usecase") {
 			return TypeUsecase
@@ -99,6 +99,23 @@ func (idxr *Indexer) Process() error {
 	sources := idxr.FindSources()
 	renderer := idxr.Renderer
 	syntaxChecker := idxr.SyntaxChecker
+
+	// TODO: txn
+	// delete old entities
+	var oldUmls []Uml
+	q := datastore.NewQuery("Uml").Filter("gitHubUrl =", idxr.GitHubUrl)
+	keys, err := q.GetAll(ctx, &oldUmls)
+	if err != nil {
+		log.Criticalf(ctx, "failed to fetch old umls: %v", err)
+		return err
+	}
+	if len(keys) > 0 {
+		log.Infof(ctx, "there are old umls found, so delete them: %v", keys)
+		if err := datastore.DeleteMulti(ctx, keys); err != nil {
+			log.Criticalf(ctx, "failed to delete old umls: %v", err)
+			return err
+		}
+	}
 
 	for _, source := range sources {
 		log.Infof(ctx, "process source: %s", source)
