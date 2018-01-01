@@ -38,6 +38,28 @@ const (
 )
 
 func init() {
+	funcMap := template.FuncMap{
+		"safehtml": func(text string) template.HTML {
+			return template.HTML(text)
+		},
+		"loopLineTimes": func(text string) []struct{} {
+			return make([]struct{}, strings.Count(text, "\n")+1)
+		},
+		"githubUrlToAnchorText": func(url string) string {
+			re := regexp.MustCompile(`^https://github.com/([^/]+)/([^/]+)/(.+)/(.+)$`)
+			matched := re.FindStringSubmatch(url)
+			if len(matched) != 5 {
+				return ""
+			}
+
+			owner := matched[1]
+			repo := matched[2]
+			_ = matched[3]
+			file := matched[4]
+			return fmt.Sprintf("%s/%s - %s", owner, repo, file)
+		},
+	}
+
 	router := chi.NewRouter()
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		ctx := appengine.NewContext(r)
@@ -90,30 +112,9 @@ func init() {
 		}
 
 		// TODO: マークアップが安定してきたら外に出す
-		tmpl := template.Must(template.New("").Funcs(template.FuncMap{
-			"safehtml": func(text string) template.HTML {
-				return template.HTML(text)
-			},
-			"loopLineTimes": func(text string) []struct{} {
-				return make([]struct{}, strings.Count(text, "\n")+1)
-			},
-			"githubUrlToAnchorText": func(url string) string {
-				re := regexp.MustCompile(`^https://github.com/([^/]+)/([^/]+)/(.+)/(.+)$`)
-				matched := re.FindStringSubmatch(url)
-				if len(matched) != 5 {
-					log.Warningf(ctx, "invalid github url: %s", url)
-					return ""
-				}
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html"))
 
-				owner := matched[1]
-				repo := matched[2]
-				_ = matched[3]
-				file := matched[4]
-				return fmt.Sprintf("%s/%s - %s", owner, repo, file)
-			},
-		}).ParseFiles("templates/index.html"))
-
-		err := tmpl.ExecuteTemplate(w, "index.html", struct {
+		err := tmpl.ExecuteTemplate(w, "base", struct {
 			Umls       []Uml
 			NextCursor string
 			Type       DiagramType
@@ -148,30 +149,9 @@ func init() {
 			return
 		}
 
-		tmpl := template.Must(template.New("").Funcs(template.FuncMap{
-			"safehtml": func(text string) template.HTML {
-				return template.HTML(text)
-			},
-			"loopLineTimes": func(text string) []struct{} {
-				return make([]struct{}, strings.Count(text, "\n")+1)
-			},
-			"githubUrlToAnchorText": func(url string) string {
-				re := regexp.MustCompile(`^https://github.com/([^/]+)/([^/]+)/(.+)/(.+)$`)
-				matched := re.FindStringSubmatch(url)
-				if len(matched) != 5 {
-					log.Warningf(ctx, "invalid github url: %s", url)
-					return ""
-				}
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/uml.html"))
 
-				owner := matched[1]
-				repo := matched[2]
-				_ = matched[3]
-				file := matched[4]
-				return fmt.Sprintf("%s/%s - %s", owner, repo, file)
-			},
-		}).ParseFiles("templates/uml.html"))
-
-		err = tmpl.ExecuteTemplate(w, "uml.html", struct {
+		err = tmpl.ExecuteTemplate(w, "base", struct {
 			Uml Uml
 		}{
 			uml,
