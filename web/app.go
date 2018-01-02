@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/xml"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -14,13 +15,13 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-// TODO: indexer と共有する
 type Uml struct {
 	ID          int64       `datastore:"-"`
 	GitHubUrl   string      `datastore:"gitHubUrl"`
 	Source      string      `datastore:"source,noindex"`
 	DiagramType DiagramType `datastore:"diagramType"`
 	Svg         string      `datastore:"svg,noindex"`
+	SvgViewBox  string      `datastore:"-"`
 	PngBase64   string      `datastore:"pngBase64,noindex"`
 	Ascii       string      `datastore:"ascii,noindex"`
 }
@@ -36,6 +37,10 @@ const (
 	TypeObject    DiagramType = "object"
 	TypeUnknwon   DiagramType = "__unknown__"
 )
+
+type SvgXml struct {
+	ViewBox string `xml:"viewBox,attr"`
+}
 
 func init() {
 	funcMap := template.FuncMap{
@@ -98,6 +103,15 @@ func init() {
 				break
 			}
 			uml.ID = key.IntID()
+
+			// Set viewBox
+			var svgXml SvgXml
+			err = xml.Unmarshal([]byte(uml.Svg), &svgXml)
+			if err != nil {
+				log.Criticalf(ctx, "svg parse error: %v", err)
+			}
+			uml.SvgViewBox = svgXml.ViewBox
+
 			umls = append(umls, uml)
 		}
 
@@ -149,6 +163,7 @@ func init() {
 			return
 		}
 
+		// TODO: マークアップが安定してきたら外に出す
 		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/uml.html"))
 
 		err = tmpl.ExecuteTemplate(w, "base", struct {

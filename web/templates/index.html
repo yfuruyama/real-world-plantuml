@@ -1,15 +1,21 @@
 {{define "content"}}
+<ul>
 {{ range $i, $uml := .Umls }}
-<div class="uml">
-  <div class="uml__id"><a href="/umls/{{ $uml.ID }}">{{ $uml.ID }}</a></div>
-  <div class="uml__ref"><a href="{{ $uml.GitHubUrl }}">{{ $uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
-  <div class="uml__svg">{{ $uml.DiagramType }}</div>
-  <div class="uml__svg">{{ $uml.Svg | safehtml }}</div>
-  <div class="uml__source">
-    <pre>{{ $uml.Source }}<span class="uml__source__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>
-  </div>
-</div>
+  <li>
+    <div class="uml">
+      <div class="uml__svg">
+        <a href="/umls/{{ $uml.ID }}">
+          <svg viewBox="{{ $uml.SvgViewBox }}" width="100%" height="100%">{{ $uml.Svg | safehtml }}</svg>
+        </a>
+      </div>
+      <div class="uml__source">
+        <pre class="uml__source__box">{{ $uml.Source }}<span class="uml__source__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>
+        <div class="uml__ref"><a href="{{ $uml.GitHubUrl }}">{{ $uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
+      </div>
+    </div>
+  </li>
 {{ end }}
+</ul>
 
 {{ if .NextCursor }}
 <div><a href="/?cursor={{ .NextCursor }}{{ if .Type }}&type={{ .Type }}{{ end }}">Next</a></div>

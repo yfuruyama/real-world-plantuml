@@ -5,5 +5,7 @@ service: default
 automatic_scaling:
 
 handlers:
+- url: /static
+  static_dir: static
 - url: /.*
   script: _go_app

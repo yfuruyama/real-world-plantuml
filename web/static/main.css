@@ -1,0 +1,107 @@
+/* Ensure layout covers the entire screen. */
+html {
+  height: 100%;
+}
+
+/* Stack toolbar and content on top of each other. */
+body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  min-height: 100%;
+}
+
+.title {
+  text-decoration: inherit;
+  color: inherit;
+}
+
+/* Place drawer and main next to each other. */
+.content {
+  display: flex;
+  flex: 1 1 auto;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+main {
+  padding-left: 16px;
+  width: 100%
+}
+
+.uml {
+  margin: 10px 0 20px 0;
+}
+.uml__svg {
+  display: inline-block;
+  border: solid 1px #aaa;
+  padding: 10px;
+  vertical-align: top;
+  width: 30%;
+}
+.uml__svg--raw {
+  display: inline-block;
+  border: solid 1px #aaa;
+  padding: 10px;
+  vertical-align: top;
+}
+.uml__source {
+  display: inline-block;
+  margin: 0 0 10px 20px;
+  width: 45%;
+}
+.uml__source__box {
+  position: relative;
+  background-color: #efefef;
+  color: #333;
+  padding: 0 10px 10px 30px;
+  margin: 0 0 0 0;
+  border: 1px solid #999;
+}
+/* cf. https://qiita.com/Ria0130/items/b49b13e4ff935993c813 */
+.uml__source__line_numbers {
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  font-size: 100%;
+  left: -20px;
+  width: 50px;
+  letter-spacing: -1px;
+  /* border-right: 1px solid #999; */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.uml__source__line_numbers>span {
+  pointer-events: none;
+  display: block;
+  counter-increment: linenumber;
+}
+.uml__source__line_numbers>span:before {
+  content: counter(linenumber);
+  color: #999;
+  display: block;
+  padding-right: .8em;
+  text-align: right;
+}
+
+ul {
+	list-style: none;
+}
+
+li:nth-child(2n+1) {
+	/* background-color: #fafafa; */
+}
+
+footer {
+  height: 50px;
+  background-color: #3f51b5;
+  color: #fff;
+}
+.footer__contact {
+  padding: 15px 0 0 10px;
+}
