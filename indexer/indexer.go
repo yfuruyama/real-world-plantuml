@@ -131,6 +131,10 @@ func (idxr *Indexer) Process() error {
 			log.Infof(ctx, "invalid syntax: %s", source)
 			continue
 		}
+		if !result.HasValidDiagram() {
+			log.Infof(ctx, "invalid diagram: %s", source)
+			continue
+		}
 
 		typ := guessDiagramType(source, result)
 

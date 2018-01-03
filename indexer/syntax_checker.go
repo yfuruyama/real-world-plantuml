@@ -4,16 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/urlfetch"
 )
-
-type SyntaxChecker struct {
-	BaseUrl string
-	ctx     context.Context
-}
 
 type SyntaxCheckRequest struct {
 	Source string `json:"source"`
@@ -23,6 +19,24 @@ type SyntaxCheckResult struct {
 	Valid       bool   `json:"valid"`
 	DiagramType string `json:"diagramType"`
 	Description string `json:"description"`
+}
+
+func (r *SyntaxCheckResult) HasValidDiagram() bool {
+	re := regexp.MustCompile(`^\(([0-9]+) .+\)$`)
+	matched := re.FindStringSubmatch(r.Description)
+	if len(matched) != 2 {
+		// regard unexpected description as valid
+		return true
+	}
+	if matched[1] == "0" {
+		return false
+	}
+	return true
+}
+
+type SyntaxChecker struct {
+	BaseUrl string
+	ctx     context.Context
 }
 
 func NewSyntaxChecker(ctx context.Context, baseUrl string) *SyntaxChecker {
