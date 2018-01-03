@@ -4,7 +4,7 @@
   <title>Real World PlantUML</title>
   <link rel="stylesheet" href="https://unpkg.com/material-components-web@0.27.0/dist/material-components-web.css">
   <script type="text/javascript" src="https://unpkg.com/material-components-web@0.27.0/dist/material-components-web.js"></script>
-  <link rel="stylesheet" href="/static/main.css">
+  <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body class="mdc-typography">
 <header class="mdc-toolbar mdc-toolbar--fixed">
@@ -18,28 +18,32 @@
 <div id="app" class="content mdc-toolbar-fixed-adjust">
   <nav class="mdc-permanent-drawer mdc-typography">
     <div class="mdc-list-group">
+      <div class="mdc-list-item">Category</div>
+      <hr class="mdc-list-divider">
       <nav id="icon-with-text-demo" class="mdc-list">
         <a class="mdc-list-item" href="/?type=sequence">
-          <!-- <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">inbox</i>Inbox -->
+          <img class="diagram-type-icon" src="/static/img/icons_sequence.png">
           Sequence
         </a>
         <a class="mdc-list-item" href="/?type=usecase">
+          <img class="diagram-type-icon" src="/static/img/icons_usecase.png">
           Usecase
         </a>
         <a class="mdc-list-item" href="/?type=class">
+          <img class="diagram-type-icon" src="/static/img/icons_class.png">
           Class
         </a>
         <a class="mdc-list-item" href="/?type=activity">
+          <img class="diagram-type-icon" src="/static/img/icons_activity.png">
           Activity
         </a>
         <a class="mdc-list-item" href="/?type=component">
+          <img class="diagram-type-icon" src="/static/img/icons_component.png">
           Component
         </a>
         <a class="mdc-list-item" href="/?type=state">
+          <img class="diagram-type-icon" src="/static/img/icons_state.png">
           State
-        </a>
-        <a class="mdc-list-item" href="/?type=object">
-          Object
         </a>
       </nav>
     </div>

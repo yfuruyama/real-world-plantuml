@@ -40,8 +40,8 @@ const (
 	TypeActivity  DiagramType = "activity"
 	TypeComponent DiagramType = "component"
 	TypeState     DiagramType = "state"
-	TypeObject    DiagramType = "object"
-	TypeUnknwon   DiagramType = "__unknown__"
+	// TypeObject    DiagramType = "object" // object is rarely detected
+	TypeUnknwon DiagramType = "__unknown__"
 )
 
 func guessDiagramType(source string, result *SyntaxCheckResult) DiagramType {
