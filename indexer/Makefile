@@ -18,4 +18,8 @@ run:
 	dev_appserver.py --port=$(PORT) --api_port=$(API_PORT) --admin_port=$(ADMIN_PORT) --logs_path=/tmp/log.db --default_gcs_bucket_name=$(GCS_BUCKET) --env_var GITHUB_API_TOKEN=$(GITHUB_API_TOKEN) --env_var RENDERER_BASE_URL=$(RENDERER_BASE_URL) --env_var SYNTAX_CHECKER_BASE_URL=$(SYNTAX_CHECKER_BASE_URL) app.yaml
 
 deploy:
-	gcloud --project=${PROJECT} app deploy
+	gcloud --project=${PROJECT} app deploy app.yaml --version=$(VERSION)
+	# appcfg.py -A $(PROJECT) -V $(VERSION) -E GITHUB_API_TOKEN:$(GITHUB_API_TOKEN) -E RENDERER_BASE_URL:$(RENDERER_BASE_URL) -E SYNTAX_CHECKER_BASE_URL:$(SYNTAX_CHECKER_BASE_URL) update .
+
+deploy_queue:
+	gcloud --project=${PROJECT} app deploy queue.yaml

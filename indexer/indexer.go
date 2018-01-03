@@ -62,8 +62,6 @@ func guessDiagramType(source string, result *SyntaxCheckResult) DiagramType {
 		return TypeActivity
 	case "STATE":
 		return TypeState
-	case "Object":
-		return TypeObject
 	default:
 		return TypeUnknwon
 	}

@@ -1,14 +1,11 @@
-FROM gradle:4.2.1-jdk8-alpine
+FROM openjdk:8-jdk
 WORKDIR /app
 COPY . /app/
 
-USER root
-RUN apk --update add graphviz
-#USER gradle
+RUN apt update && apt install -y graphviz fonts-wqy-zenhei
 
 EXPOSE 8080
-ENV HOME /app
 
-RUN gradle wrapper
 RUN ./gradlew build
+
 CMD ./gradlew run

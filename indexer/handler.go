@@ -101,7 +101,7 @@ func HandleGcsNotification(w http.ResponseWriter, r *http.Request) {
 			Payload: bodyBytes,
 			Header:  header,
 			Method:  "POST",
-			Delay:   time.Second * time.Duration(i),
+			Delay:   5 * time.Second * time.Duration(i),
 		}
 		taskqueue.Add(ctx, task, "index-create-queue")
 

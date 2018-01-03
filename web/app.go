@@ -74,7 +74,7 @@ func init() {
 		q := datastore.NewQuery("Uml").Limit(limit)
 
 		// Set filter
-		if typ == TypeSequence || typ == TypeUsecase || typ == TypeClass || typ == TypeActivity || typ == TypeComponent || typ == TypeState || typ == TypeObject {
+		if typ == TypeSequence || typ == TypeUsecase || typ == TypeClass || typ == TypeActivity || typ == TypeComponent || typ == TypeState {
 			q = q.Filter("diagramType =", typ)
 		}
 
