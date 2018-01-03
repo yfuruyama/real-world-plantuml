@@ -10,6 +10,10 @@ import (
 	"google.golang.org/appengine/log"
 )
 
+const (
+	MINIMUM_UML_SOURCE_LENGTH = 50
+)
+
 type Indexer struct {
 	GitHubUrl     string
 	Content       string
@@ -85,9 +89,10 @@ func (idxr *Indexer) FindSources() []string {
 			break
 		}
 
-		// TODO: 最小文字数チェック
 		source := fmt.Sprintf("%s@enduml", content[startIdx:endIdx])
-		sources = append(sources, source)
+		if len(source) >= MINIMUM_UML_SOURCE_LENGTH {
+			sources = append(sources, source)
+		}
 
 		content = content[(endIdx + len("@enduml")):]
 	}
