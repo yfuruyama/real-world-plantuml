@@ -59,6 +59,7 @@ main {
   padding: 0 10px 10px 30px;
   margin: 0 0 0 0;
   border: 1px solid #999;
+  white-space: pre-wrap;
 }
 /* cf. https://qiita.com/Ria0130/items/b49b13e4ff935993c813 */
 .uml__source__line_numbers {
