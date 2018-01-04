@@ -32,28 +32,28 @@
       <div class="mdc-list-item">Category</div>
       <hr class="mdc-list-divider">
       <nav id="icon-with-text-demo" class="mdc-list">
-        <a class="mdc-list-item" href="/?type=sequence">
-          <img class="diagram-type-icon" src="/static/img/icons_sequence.png">
+        <a class='mdc-list-item {{ if eq .Type "sequence" }}diagram_type__selected{{ end }}' href="/?type=sequence">
+          <img class="diagram_type__icon" src="/static/img/icons_sequence.png">
           Sequence
         </a>
-        <a class="mdc-list-item" href="/?type=usecase">
-          <img class="diagram-type-icon" src="/static/img/icons_usecase.png">
+        <a class='mdc-list-item {{ if eq .Type "usecase" }}diagram_type__selected{{ end }}' href="/?type=usecase">
+          <img class="diagram_type__icon" src="/static/img/icons_usecase.png">
           Usecase
         </a>
-        <a class="mdc-list-item" href="/?type=class">
-          <img class="diagram-type-icon" src="/static/img/icons_class.png">
+        <a class='mdc-list-item {{ if eq .Type "class" }}diagram_type__selected{{ end }}' href="/?type=class">
+          <img class="diagram_type__icon" src="/static/img/icons_class.png">
           Class
         </a>
-        <a class="mdc-list-item" href="/?type=activity">
-          <img class="diagram-type-icon" src="/static/img/icons_activity.png">
+        <a class='mdc-list-item {{ if eq .Type "activity" }}diagram_type__selected{{ end }}' href="/?type=activity">
+          <img class="diagram_type__icon" src="/static/img/icons_activity.png">
           Activity
         </a>
-        <a class="mdc-list-item" href="/?type=component">
-          <img class="diagram-type-icon" src="/static/img/icons_component.png">
+        <a class='mdc-list-item {{ if eq .Type "component" }}diagram_type__selected{{ end }}' href="/?type=component">
+          <img class="diagram_type__icon" src="/static/img/icons_component.png">
           Component
         </a>
-        <a class="mdc-list-item" href="/?type=state">
-          <img class="diagram-type-icon" src="/static/img/icons_state.png">
+        <a class='mdc-list-item {{ if eq .Type "state" }}diagram_type__selected{{ end }}' href="/?type=state">
+          <img class="diagram_type__icon" src="/static/img/icons_state.png">
           State
         </a>
       </nav>

@@ -33,7 +33,10 @@ main {
   overflow: auto;
 }
 
-.diagram-type-icon {
+.diagram_type__selected {
+  background-color: #ededed;
+}
+.diagram_type__icon {
   width: 40px;
   margin: 0 10px 0 0;
 }
