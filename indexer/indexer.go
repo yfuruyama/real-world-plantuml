@@ -83,13 +83,15 @@ func (idxr *Indexer) FindSources() []string {
 	for {
 		startIdx := strings.Index(content, "@startuml")
 		endIdx := strings.Index(content, "@enduml")
+		log.Debugf(idxr.ctx, "length:%d, startIdx:%d, endIdx:%d", len(content), startIdx, endIdx)
 		if startIdx == -1 || endIdx == -1 {
 			break
 		}
-
-		source := fmt.Sprintf("%s@enduml", content[startIdx:endIdx])
-		if len(source) >= MINIMUM_UML_SOURCE_LENGTH {
-			sources = append(sources, source)
+		if startIdx < endIdx {
+			source := fmt.Sprintf("%s@enduml", content[startIdx:endIdx])
+			if len(source) >= MINIMUM_UML_SOURCE_LENGTH {
+				sources = append(sources, source)
+			}
 		}
 
 		content = content[(endIdx + len("@enduml")):]

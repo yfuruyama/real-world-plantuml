@@ -1,6 +1,6 @@
 runtime: go
 api_version: go1
-instance_class: F1
+instance_class: B1
 service: indexer
 manual_scaling:
   instances: 1
