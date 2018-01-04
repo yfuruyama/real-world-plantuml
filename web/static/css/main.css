@@ -109,7 +109,17 @@ footer {
   height: 50px;
   background-color: #3f51b5;
   color: #fff;
+  text-align: left;
+  padding: 5px 0 5px 10px;
 }
 .footer__contact {
-  padding: 15px 0 0 10px;
+  font-size: 14px;
+}
+.footer__contact a {
+  color: #fff;
+  text-decoration: none;
+  font-style: italic;
+}
+.footer__twitter {
+  /* padding: 15px 0 0 10px; */
 }
