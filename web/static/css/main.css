@@ -58,50 +58,68 @@ main {
   display: inline-block;
   margin: 0 0 10px 20px;
   width: 45%;
-}
-.uml__source__box {
-  position: relative;
-  background-color: #efefef;
-  color: #333;
-  padding: 0 10px 10px 30px;
-  margin: 0 0 0 0;
   border: 1px solid #999;
-  white-space: pre-wrap;
 }
-.uml__source__box__copy {
+.uml__source__header {
+  position: relative;
+  height: 25px;
+  padding: 5px 0 5px 10px;
+  background-color: #efefef;
+  border-bottom: 1px solid #999;
+}
+.uml__source__header__ref a {
+  color: #555;
+  text-decoration: none;
+}
+.uml__source__header__copy {
   position: absolute;
   top: 0px;
   right: 0px;
-  background-color: #aaa;
+  background-color: #888;
   color: #fff;
   border-left: 1px solid #999;
-  border-bottom: 1px solid #999;
+  border-bottom: none;
   border-top: none;
   border-right: none;
-  padding: 5px 10px 5px 10px;
+  padding: 2px 10px 4px 10px;
+  height: 100%;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+.uml__source__content {
+  position: relative;
+  /* background-color: #efefef; */
+  color: #333;
+  padding: 5px 10px 10px 30px;
+  margin: 0 0 0 0;
+  /* white-space: pre-wrap; */
+  white-space: pre;
+  overflow-x: auto;
 }
 /* cf. https://qiita.com/Ria0130/items/b49b13e4ff935993c813 */
-.uml__source__line_numbers {
+.uml__source__content__line_numbers {
   display: block;
   position: absolute;
   pointer-events: none;
-  top: 0;
+  top: 5px;
   font-size: 100%;
   left: -20px;
   width: 50px;
   letter-spacing: -1px;
-  /* border-right: 1px solid #999; */
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  user-select: none;
 }
-.uml__source__line_numbers>span {
+.uml__source__content__line_numbers>span {
   pointer-events: none;
   display: block;
   counter-increment: linenumber;
 }
-.uml__source__line_numbers>span:before {
+.uml__source__content__line_numbers>span:before {
   content: counter(linenumber);
   color: #999;
   display: block;

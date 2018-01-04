@@ -59,7 +59,12 @@ func init() {
 			repo := matched[2]
 			_ = matched[3]
 			file := matched[4]
-			return fmt.Sprintf("%s/%s - %s", owner, repo, file)
+			text := fmt.Sprintf("%s/%s - %s", owner, repo, file)
+			// abbreviation
+			if len(text) > 40 {
+				text = fmt.Sprintf("%s...%s", text[0:20], text[len(text)-20:len(text)])
+			}
+			return text
 		},
 	}
 

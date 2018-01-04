@@ -4,13 +4,16 @@
   <li>
     <div class="uml">
       <div class="uml__svg">
-        <a href="/umls/{{ $uml.ID }}">
+        <!-- <a href="/umls/{{ $uml.ID }}"> -->
           <svg viewBox="{{ $uml.SvgViewBox }}" width="100%" height="100%">{{ $uml.Svg | safehtml }}</svg>
-        </a>
+        <!-- </a> -->
       </div>
       <div class="uml__source">
-        <pre class="uml__source__box"><button class="uml__source__box__copy" data-clipboard-text="{{ $uml.Source }}">Copy</button>{{ $uml.Source }}<span class="uml__source__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>
-        <div class="uml__ref"><a href="{{ $uml.GitHubUrl }}">{{ $uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
+        <div class="uml__source__header">
+          <div class="uml__source__header__ref"><a href="{{ $uml.GitHubUrl }}" target="_blank">{{ $uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
+          <button class="uml__source__header__copy" data-clipboard-text="{{ $uml.Source }}">Copy</button>
+        </div>
+        <pre class="uml__source__content">{{ $uml.Source }}<span class="uml__source__content__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>
       </div>
     </div>
   </li>
@@ -22,7 +25,7 @@
 {{ end }}
 
 <script>
-  var clipboard = new Clipboard('.uml__source__box__copy');
+  var clipboard = new Clipboard('.uml__source__header__copy');
   clipboard.on('success', function(e) {
     var orig = e.trigger.innerText;
     e.trigger.innerText = "Copied!";
