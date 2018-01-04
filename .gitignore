@@ -1,4 +1,5 @@
 .DS_Store
+app.dist.yaml
 web/vendor
 
 scraping/node_modules

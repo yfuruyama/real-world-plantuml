@@ -3,6 +3,10 @@ api_version: go1
 instance_class: F1
 service: indexer
 automatic_scaling:
+env_variables:
+  GITHUB_API_TOKEN: {{.GITHUB_API_TOKEN}}
+  RENDERER_BASE_URL: {{.RENDERER_BASE_URL}}
+  SYNTAX_CHECKER_BASE_URL: {{.SYNTAX_CHECKER_BASE_URL}}
 
 handlers:
 - url: /_ah/push-handlers/*
