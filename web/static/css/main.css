@@ -68,6 +68,18 @@ main {
   border: 1px solid #999;
   white-space: pre-wrap;
 }
+.uml__source__box__copy {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background-color: #aaa;
+  color: #fff;
+  border-left: 1px solid #999;
+  border-bottom: 1px solid #999;
+  border-top: none;
+  border-right: none;
+  padding: 5px 10px 5px 10px;
+}
 /* cf. https://qiita.com/Ria0130/items/b49b13e4ff935993c813 */
 .uml__source__line_numbers {
   display: block;
