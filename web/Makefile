@@ -9,7 +9,9 @@ test:
 	echo "TBD"
 
 run:
-	dev_appserver.py --logs_path=/tmp/log.db --port=$(PORT) --api_port=$(API_PORT) --admin_port=$(ADMIN_PORT) app.yaml
+	GA_TRACKING_ID=$(GA_TRACKING_ID) go run ../util/gen_app_yaml.go --in app.yaml --out app.dist.yaml
+	dev_appserver.py --logs_path=/tmp/log.db --port=$(PORT) --api_port=$(API_PORT) --admin_port=$(ADMIN_PORT) app.dist.yaml
 
 deploy:
-	gcloud --project=${PROJECT} app deploy app.yaml --version=$(VERSION)
+	GA_TRACKING_ID=$(GA_TRACKING_ID) go run ../util/gen_app_yaml.go --in app.yaml --out app.dist.yaml
+	gcloud --project=$(PROJECT) app deploy app.dist.yaml --version=$(VERSION)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -40,7 +41,14 @@ type SvgXml struct {
 	ViewBox string `xml:"viewBox,attr"`
 }
 
+type GlobalTemplateVars struct {
+	GA_TRACKING_ID string
+}
+
 func init() {
+	gaTrackingId := os.Getenv("GA_TRACKING_ID")
+	globalTemplateVars := GlobalTemplateVars{gaTrackingId}
+
 	funcMap := template.FuncMap{
 		"safehtml": func(text string) template.HTML {
 			return template.HTML(text)
@@ -66,6 +74,18 @@ func init() {
 			}
 			return text
 		},
+	}
+
+	handle404 := func(w http.ResponseWriter, r *http.Request) {
+		// TODO: マークアップが安定してきたら外に出す
+		tmpl := template.Must(template.New("").ParseFiles("templates/base.html", "templates/404.html"))
+		_ = tmpl.ExecuteTemplate(w, "base", struct {
+			*GlobalTemplateVars
+		}{
+			&globalTemplateVars,
+		})
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	router := chi.NewRouter()
@@ -132,10 +152,12 @@ func init() {
 		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html"))
 
 		err := tmpl.ExecuteTemplate(w, "base", struct {
+			*GlobalTemplateVars
 			Umls       []Uml
 			NextCursor string
 			Type       DiagramType
 		}{
+			&globalTemplateVars,
 			umls,
 			nextCursor,
 			typ,
@@ -170,8 +192,10 @@ func init() {
 		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/uml.html"))
 
 		err = tmpl.ExecuteTemplate(w, "base", struct {
+			*GlobalTemplateVars
 			Uml Uml
 		}{
+			&globalTemplateVars,
 			uml,
 		})
 		if err != nil {
@@ -184,12 +208,4 @@ func init() {
 	router.NotFound(handle404)
 
 	http.Handle("/", router)
-}
-
-func handle404(w http.ResponseWriter, r *http.Request) {
-	// TODO: マークアップが安定してきたら外に出す
-	tmpl := template.Must(template.New("").ParseFiles("templates/base.html", "templates/404.html"))
-	_ = tmpl.ExecuteTemplate(w, "base", nil)
-	w.WriteHeader(http.StatusNotFound)
-	return
 }

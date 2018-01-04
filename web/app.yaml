@@ -3,6 +3,8 @@ api_version: go1
 instance_class: F1
 service: default
 automatic_scaling:
+env_variables:
+  GA_TRACKING_ID: {{.GA_TRACKING_ID}}
 
 handlers:
 - url: /static
