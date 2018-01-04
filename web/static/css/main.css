@@ -153,3 +153,7 @@ footer {
 .footer__twitter {
   /* padding: 15px 0 0 10px; */
 }
+
+.error {
+  margin: 20px 0 0 10px;
+}

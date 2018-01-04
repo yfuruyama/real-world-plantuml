@@ -157,7 +157,7 @@ func init() {
 		if err != nil {
 			if err == datastore.ErrNoSuchEntity {
 				log.Warningf(ctx, "Uml not found: %v", umlID)
-				w.WriteHeader(http.StatusNotFound)
+				handle404(w, r)
 				return
 			}
 
@@ -181,5 +181,15 @@ func init() {
 		}
 	})
 
+	router.NotFound(handle404)
+
 	http.Handle("/", router)
+}
+
+func handle404(w http.ResponseWriter, r *http.Request) {
+	// TODO: マークアップが安定してきたら外に出す
+	tmpl := template.Must(template.New("").ParseFiles("templates/base.html", "templates/404.html"))
+	_ = tmpl.ExecuteTemplate(w, "base", nil)
+	w.WriteHeader(http.StatusNotFound)
+	return
 }
