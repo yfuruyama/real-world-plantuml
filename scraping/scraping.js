@@ -3,15 +3,13 @@ const Chromy = require('chromy')
 let chromy = new Chromy({
   visible: true,
   launchBrowser: false,
-})
+});
 
-let searchWord = 'startuml enduml size:>100 license:mit language:Text';
-
-async function scrape() {
+async function scrape(searchWord) {
   var page = 1;
 
   while (true) {
-    let url = 'https://github.com/search?utf8=✓&type=Code&q=' + encodeURIComponent(searchWord) + '&p=' + page;
+    let url = 'https://github.com/search?type=Code&q=' + encodeURIComponent(searchWord) + '&p=' + page;
     console.error('scrape url:' + url);
     await chromy.goto(url);
 
@@ -36,14 +34,25 @@ async function scrape() {
     page++;
 
     // sleep
-    await new Promise((resolve, reject) => {
+    await new Promise(resolve => {
       setTimeout(() => {
         resolve();
       }, 10000);
     });
   }
-
-  await chromy.close();
 }
 
-scrape();
+const searchWords = [
+  'startuml enduml size:>100 license:mit language:Text',
+  'startuml enduml size:>100 license:mit language:Markdown',
+  'startuml enduml size:>100 license:apache-2.0 language:Text',
+  'startuml enduml size:>100 license:apache-2.0 language:Markdown',
+];
+
+(async function() {
+  for (const word of searchWords) {
+    await scrape(word);
+  }
+})();
+
+chromy.close();
