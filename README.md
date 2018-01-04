@@ -8,7 +8,7 @@ real-world-plantuml
 Run server
 
 ```
-make run
+make run GA_TRACKING_ID=${GA_TRACKING_ID}
 ```
 
 ### indexer

@@ -18,6 +18,21 @@ body {
   color: inherit;
 }
 
+.header__search {
+  position: fixed;
+  left: 50%;
+  margin-left: -200px;
+}
+.header__search>input {
+  border-radius: 3px;
+  border: none;
+  background-color: #303AA5;
+  height: 30px;
+  padding: 0 0 0 10px;
+  width: 400px;
+  color: #fff;
+}
+
 /* Place drawer and main next to each other. */
 .content {
   display: flex;

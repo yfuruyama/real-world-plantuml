@@ -8,6 +8,7 @@ import (
 
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/search"
 )
 
 const (
@@ -32,6 +33,10 @@ type Uml struct {
 }
 
 type DiagramType string
+
+type FTSDocument struct {
+	Document string
+}
 
 const (
 	TypeSequence  DiagramType = "sequence"
@@ -177,6 +182,24 @@ func (idxr *Indexer) Process() error {
 		if err != nil {
 			log.Criticalf(ctx, "put error: %s", err)
 			return err
+		}
+
+		// Register to full-text search index
+		fts, err := search.Open("uml_source")
+		if err != nil {
+			log.Criticalf(ctx, "failed to open FTS: %s", err)
+			// Ignore error
+			continue
+		}
+
+		doc := FTSDocument{
+			Document: source,
+		}
+		_, err = fts.Put(ctx, fmt.Sprintf("%d", key.IntID()), &doc)
+		if err != nil {
+			log.Criticalf(ctx, "failed to put document to FTS: %s", err)
+			// Ignore error
+			continue
 		}
 	}
 

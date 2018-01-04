@@ -1,3 +1,0 @@
-https://github.com/plantuml/plantuml-server/blob/8be5f6284e7ef527c83b206ad37379d2546397ba/src/main/webapp/resource/test2diagrams.txt
-https://github.com/dulanism/graphviz_scripts/blob/c86e3791d1f94bb2dd86c165f09ca575926bc1a6/UMLdiagrams/SampleUseCase.txt
-https://github.com/mac2000/mac2000.github.com/blob/8d5d643bf25e4199a99cd72055d41ba9c031480d/examples/uml_basics/Association/Unidirectional/UML.txt
