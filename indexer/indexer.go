@@ -35,7 +35,7 @@ type Uml struct {
 type DiagramType string
 
 type FTSDocument struct {
-	Document string
+	Document string `search:"document"`
 }
 
 const (
@@ -110,8 +110,14 @@ func (idxr *Indexer) Process() error {
 	renderer := idxr.Renderer
 	syntaxChecker := idxr.SyntaxChecker
 
+	fts, err := search.Open("uml_source")
+	if err != nil {
+		log.Criticalf(ctx, "failed to open FTS: %s", err)
+		return err
+	}
+
 	// TODO: txn
-	// delete old entities
+	// Delete entities
 	var oldUmls []Uml
 	q := datastore.NewQuery("Uml").Filter("gitHubUrl =", idxr.GitHubUrl)
 	keys, err := q.GetAll(ctx, &oldUmls)
@@ -124,6 +130,19 @@ func (idxr *Indexer) Process() error {
 		if err := datastore.DeleteMulti(ctx, keys); err != nil {
 			log.Criticalf(ctx, "failed to delete old umls: %v", err)
 			return err
+		}
+
+		// Delete index from full-text search
+		for _, key := range keys {
+			err = fts.Delete(ctx, fmt.Sprintf("%d", key.IntID()))
+			if err == nil {
+				log.Infof(ctx, "deleted document from FTS: %v", key.IntID())
+			} else {
+				if err != search.ErrNoSuchDocument {
+					log.Criticalf(ctx, "failed to delete document from FTS: %s", err)
+					return err
+				}
+			}
 		}
 	}
 
@@ -185,13 +204,6 @@ func (idxr *Indexer) Process() error {
 		}
 
 		// Register to full-text search index
-		fts, err := search.Open("uml_source")
-		if err != nil {
-			log.Criticalf(ctx, "failed to open FTS: %s", err)
-			// Ignore error
-			continue
-		}
-
 		doc := FTSDocument{
 			Document: source,
 		}

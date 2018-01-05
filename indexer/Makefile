@@ -16,7 +16,10 @@ test:
 
 run:
 	GITHUB_API_TOKEN=$(GITHUB_API_TOKEN) RENDERER_BASE_URL=$(RENDERER_BASE_URL) SYNTAX_CHECKER_BASE_URL=$(SYNTAX_CHECKER_BASE_URL) go run ../util/gen_app_yaml.go --in app.yaml --out app.dist.yaml 
-	dev_appserver.py --port=$(PORT) --api_port=$(API_PORT) --admin_port=$(ADMIN_PORT) --logs_path=/tmp/log.db --default_gcs_bucket_name=$(GCS_BUCKET) app.dist.yaml
+	dev_appserver.py --port=$(PORT) --api_port=$(API_PORT) --admin_port=$(ADMIN_PORT) --logs_path=/tmp/log.db --storage_path=/tmp/storage.db --search_indexes_path=/tmp/search.db --clear_search_indexes=false --default_gcs_bucket_name=$(GCS_BUCKET) app.dist.yaml
+
+notify:
+	curl -X POST http://localhost:$(PORT)/_ah/push-handlers/gcs_notification --data '{"message": {"attributes":{"objectId":"$(OBJECT_ID)", "eventType":"OBJECT_FINALIZE"}, "messageId":"xxx"}, "subscription" :"xxx"}'
 
 deploy:
 	GITHUB_API_TOKEN=$(GITHUB_API_TOKEN) RENDERER_BASE_URL=$(RENDERER_BASE_URL) SYNTAX_CHECKER_BASE_URL=$(SYNTAX_CHECKER_BASE_URL) go run ../util/gen_app_yaml.go --in app.yaml --out app.dist.yaml 

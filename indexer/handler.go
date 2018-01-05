@@ -20,10 +20,8 @@ type PubSubSubscription struct {
 }
 
 type PubSubMessage struct {
-	Data        string            `json:data`
-	Attributes  map[string]string `json:attributes`
-	MessageId   string            `json:messageId`
-	PublishTime string            `json:publishTime`
+	Attributes map[string]string `json:attributes`
+	MessageId  string            `json:messageId`
 }
 
 func HandleGcsNotification(w http.ResponseWriter, r *http.Request) {

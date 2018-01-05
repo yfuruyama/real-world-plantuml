@@ -21,8 +21,8 @@
 <header class="mdc-toolbar mdc-toolbar--fixed">
   <div class="mdc-toolbar__row">
     <span class="mdc-toolbar__title"><a href="/" class="title">Real World PlantUML</a></span>
-    <form method="GET" action="/" class="header__search">
-      <input type="text" name="q" placeholder="Search">
+    <form method="GET" action="/search" class="header__search">
+      <input type="text" name="q" placeholder="Search" value="{{ .Query }}">
     </form>
   </div>
 </header>

@@ -14,6 +14,7 @@ import (
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/search"
 )
 
 type Uml struct {
@@ -44,6 +45,12 @@ type SvgXml struct {
 type GlobalTemplateVars struct {
 	GA_TRACKING_ID string
 }
+
+type FTSDocument struct {
+	Document string `search:"document"`
+}
+
+const NUM_OF_ITEMS_PER_PAGE = 10
 
 func init() {
 	gaTrackingId := os.Getenv("GA_TRACKING_ID")
@@ -95,8 +102,7 @@ func init() {
 		queryParams := r.URL.Query()
 		typ := DiagramType(queryParams.Get("type"))
 
-		limit := 10
-		q := datastore.NewQuery("Uml").Limit(limit)
+		q := datastore.NewQuery("Uml").Limit(NUM_OF_ITEMS_PER_PAGE)
 
 		// Set filter
 		if typ == TypeSequence || typ == TypeUsecase || typ == TypeClass || typ == TypeActivity || typ == TypeComponent || typ == TypeState {
@@ -140,7 +146,7 @@ func init() {
 
 		// Get nextCursor
 		var nextCursor string
-		if len(umls) >= limit {
+		if len(umls) >= NUM_OF_ITEMS_PER_PAGE {
 			dsCursor, err := iter.Cursor()
 			if err == nil {
 				nextCursor = dsCursor.String()
@@ -156,11 +162,13 @@ func init() {
 			Umls       []Uml
 			NextCursor string
 			Type       DiagramType
+			Query      string
 		}{
 			&globalTemplateVars,
 			umls,
 			nextCursor,
 			typ,
+			"",
 		})
 		if err != nil {
 			log.Criticalf(ctx, "%s", err)
@@ -197,6 +205,114 @@ func init() {
 		}{
 			&globalTemplateVars,
 			uml,
+		})
+		if err != nil {
+			log.Criticalf(ctx, "%s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	})
+
+	router.Get("/search", func(w http.ResponseWriter, r *http.Request) {
+		ctx := appengine.NewContext(r)
+		queryWord := r.URL.Query().Get("q")
+
+		fts, err := search.Open("uml_source")
+		if err != nil {
+			log.Criticalf(ctx, "failed to open FTS: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		options := search.SearchOptions{
+			Limit:   NUM_OF_ITEMS_PER_PAGE,
+			IDsOnly: true,
+		}
+
+		cursor := r.URL.Query().Get("cursor")
+		if cursor != "" {
+			options.Cursor = search.Cursor(cursor)
+		}
+
+		var nextCursor string
+		var entityIds []int64
+		for iter := fts.Search(ctx, "document = "+queryWord, &options); ; {
+			id, err := iter.Next(nil)
+			if err == search.Done {
+				if len(entityIds) >= NUM_OF_ITEMS_PER_PAGE {
+					nextCursor = string(iter.Cursor())
+				}
+				break
+			}
+			if err != nil {
+				log.Criticalf(ctx, "FTS search error: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			intId, _ := strconv.ParseInt(id, 10, 64)
+			entityIds = append(entityIds, intId)
+		}
+		log.Infof(ctx, "query result: %v", entityIds)
+
+		keys := make([]*datastore.Key, len(entityIds))
+		for i, id := range entityIds {
+			keys[i] = datastore.NewKey(ctx, "Uml", "", id, nil)
+		}
+		umls := make([]Uml, len(keys))
+		notFounds := make([]bool, len(keys))
+
+		err = datastore.GetMulti(ctx, keys, umls)
+		if err != nil {
+			multiErr, ok := err.(appengine.MultiError)
+			if !ok {
+				log.Criticalf(ctx, "Datastore fetch error: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			for i, e := range multiErr {
+				if e == nil {
+					continue
+				}
+				if e == datastore.ErrNoSuchEntity {
+					log.Warningf(ctx, "FTS index found, but datastore entity not found: %v", entityIds[i])
+					notFounds[i] = true
+					continue
+				}
+				log.Criticalf(ctx, "Datastore fetch partial error: %v", e)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		}
+		var filteredUmls []Uml
+		for i, notFound := range notFounds {
+			if !notFound {
+				uml := umls[i]
+				// Set viewBox
+				var svgXml SvgXml
+				err = xml.Unmarshal([]byte(uml.Svg), &svgXml)
+				if err != nil {
+					log.Criticalf(ctx, "svg parse error: %v", err)
+				}
+				uml.SvgViewBox = svgXml.ViewBox
+				filteredUmls = append(filteredUmls, uml)
+			}
+		}
+
+		// TODO: マークアップが安定してきたら外に出す
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html"))
+
+		err = tmpl.ExecuteTemplate(w, "base", struct {
+			*GlobalTemplateVars
+			Umls       []Uml
+			NextCursor string
+			Type       DiagramType
+			Query      string
+		}{
+			&globalTemplateVars,
+			filteredUmls,
+			nextCursor,
+			"",
+			queryWord,
 		})
 		if err != nil {
 			log.Criticalf(ctx, "%s", err)
