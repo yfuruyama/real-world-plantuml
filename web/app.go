@@ -234,9 +234,11 @@ func init() {
 			options.Cursor = search.Cursor(cursor)
 		}
 
+		query := fmt.Sprintf("document = \"%s\"", queryWord)
+
 		var nextCursor string
 		var entityIds []int64
-		for iter := fts.Search(ctx, "document = "+queryWord, &options); ; {
+		for iter := fts.Search(ctx, query, &options); ; {
 			id, err := iter.Next(nil)
 			if err == search.Done {
 				if len(entityIds) >= NUM_OF_ITEMS_PER_PAGE {
@@ -245,9 +247,8 @@ func init() {
 				break
 			}
 			if err != nil {
-				log.Criticalf(ctx, "FTS search error: %v", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
+				log.Criticalf(ctx, "FTS search unexpected error: %v", err)
+				break
 			}
 			intId, _ := strconv.ParseInt(id, 10, 64)
 			entityIds = append(entityIds, intId)
