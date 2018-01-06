@@ -10,7 +10,7 @@ body {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  height: 100%
+  /* height: 100% */
 }
 
 .title {
@@ -44,8 +44,8 @@ body {
 main {
   padding-left: 16px;
   width: 100%;
-  height: 100%;
-  overflow: auto;
+  /* height: 100%; */
+  /* overflow: auto; */
 }
 
 .diagram_type__selected {
@@ -154,22 +154,25 @@ li:nth-child(2n+1) {
 }
 
 footer {
-  height: 50px;
+  height: 40px;
   background-color: #3f51b5;
   color: #fff;
-  text-align: left;
+  text-align: center;
   padding: 5px 0 5px 10px;
+  font-size: 14px;
 }
 .footer__contact {
-  font-size: 14px;
 }
 .footer__contact a {
   color: #fff;
   text-decoration: none;
-  font-style: italic;
+  font-weight: bold;
 }
 .footer__twitter {
   /* padding: 15px 0 0 10px; */
+}
+.footer__license {
+  font-style: italic;
 }
 
 .error {
