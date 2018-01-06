@@ -64,7 +64,11 @@ main {
   border: solid 1px #aaa;
   padding: 10px;
   vertical-align: top;
-  width: 30%;
+  width: 300px;
+}
+.uml__svg__wrapper {
+  width: 300px;
+  height: 300px;
 }
 .uml__svg--raw {
   display: inline-block;
@@ -75,13 +79,15 @@ main {
 .uml__source {
   display: inline-block;
   margin: 0 0 10px 20px;
-  width: 45%;
+  width: 500px;
+  /* height: 300px; */
   border: 1px solid #999;
 }
 .uml__source__header {
   position: relative;
-  height: 25px;
+  height: 20px;
   padding: 5px 0 5px 10px;
+  font-size: 14px;
   background-color: #efefef;
   border-bottom: 1px solid #999;
 }
@@ -109,13 +115,15 @@ main {
 }
 .uml__source__content {
   position: relative;
+  height: 280px;
+  font-size: 12px;
   /* background-color: #efefef; */
   color: #333;
   padding: 5px 10px 10px 30px;
   margin: 0 0 0 0;
   /* white-space: pre-wrap; */
   white-space: pre;
-  overflow-x: auto;
+  overflow: auto;
 }
 /* cf. https://qiita.com/Ria0130/items/b49b13e4ff935993c813 */
 .uml__source__content__line_numbers {
@@ -124,6 +132,7 @@ main {
   pointer-events: none;
   top: 5px;
   font-size: 100%;
+  /* font-size: 12px; */
   left: -20px;
   width: 50px;
   letter-spacing: -1px;
