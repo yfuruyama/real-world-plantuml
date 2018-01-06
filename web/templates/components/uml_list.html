@@ -12,7 +12,7 @@
           <div class="uml__source__header__ref"><a href="{{ $uml.GitHubUrl }}" target="_blank">{{ $uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
           <button class="uml__source__header__copy" data-clipboard-text="{{ $uml.Source }}">Copy</button>
         </div>
-        <pre class="uml__source__content">{{ $uml.Source }}<span class="uml__source__content__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>
+        <pre class="uml__source__content">{{ $uml.Source | html | highlight $.Query }}<span class="uml__source__content__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>
       </div>
     </div>
   </li>

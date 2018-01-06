@@ -97,6 +97,16 @@ func init() {
 		"staticPath": func(ctx context.Context, filePath string) string {
 			return fmt.Sprintf("/static/%s?v=%s", filePath, appengine.VersionID(ctx))
 		},
+		"highlight": func(word, code string) string {
+			if word == "" {
+				return code
+			}
+			re, err := regexp.Compile(word)
+			if err != nil {
+				return code
+			}
+			return re.ReplaceAllString(code, fmt.Sprintf("<mark>%s</mark>", word))
+		},
 	}
 
 	router := chi.NewRouter()
