@@ -2,54 +2,17 @@ package web
 
 import (
 	"context"
-	"encoding/xml"
 	"fmt"
 	"html/template"
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi"
 	"google.golang.org/appengine"
-	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/search"
 )
-
-type Uml struct {
-	ID          int64       `datastore:"-"`
-	GitHubUrl   string      `datastore:"gitHubUrl"`
-	Source      string      `datastore:"source,noindex"`
-	DiagramType DiagramType `datastore:"diagramType"`
-	Svg         string      `datastore:"svg,noindex"`
-	SvgViewBox  string      `datastore:"-"`
-	PngBase64   string      `datastore:"pngBase64,noindex"`
-	Ascii       string      `datastore:"ascii,noindex"`
-}
-type DiagramType string
-
-const (
-	TypeSequence  DiagramType = "sequence"
-	TypeUsecase   DiagramType = "usecase"
-	TypeClass     DiagramType = "class"
-	TypeActivity  DiagramType = "activity"
-	TypeComponent DiagramType = "component"
-	TypeState     DiagramType = "state"
-)
-
-type SvgXml struct {
-	ViewBox string `xml:"viewBox,attr"`
-}
-
-type GlobalTemplateVars struct {
-	GA_TRACKING_ID string
-}
-
-type FTSDocument struct {
-	Document string `search:"document"`
-}
 
 type CommonTemplateVars struct {
 	GATrackingID string
@@ -115,63 +78,24 @@ func init() {
 
 		queryParams := r.URL.Query()
 		typ := DiagramType(queryParams.Get("type"))
+		cursor := queryParams.Get("cursor")
 
-		q := datastore.NewQuery("Uml").Limit(NUM_OF_ITEMS_PER_PAGE)
-
-		// Set filter
-		if typ == TypeSequence || typ == TypeUsecase || typ == TypeClass || typ == TypeActivity || typ == TypeComponent || typ == TypeState {
-			q = q.Filter("diagramType =", typ)
+		umls, nextCursor, err := FetchUmls(ctx, typ, NUM_OF_ITEMS_PER_PAGE, cursor)
+		if err != nil {
+			log.Criticalf(ctx, "%s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
-
-		// Set cursor
-		if cursor := queryParams.Get("cursor"); cursor != "" {
-			decoded, err := datastore.DecodeCursor(cursor)
-			if err == nil {
-				q = q.Start(decoded)
-			}
-		}
-
-		// Do query
-		iter := q.Run(ctx)
-		var umls []Uml
-		for {
-			var uml Uml
-			key, err := iter.Next(&uml)
-			if err == datastore.Done {
-				log.Infof(ctx, "iter done")
-				break
-			}
-			if err != nil {
-				log.Criticalf(ctx, "datastore fetch error: %v", err)
-				break
-			}
-			uml.ID = key.IntID()
-
-			// Set viewBox
-			var svgXml SvgXml
-			err = xml.Unmarshal([]byte(uml.Svg), &svgXml)
-			if err != nil {
-				log.Criticalf(ctx, "svg parse error: %v", err)
-			}
-			uml.SvgViewBox = svgXml.ViewBox
-
-			umls = append(umls, uml)
-		}
-
-		// Get nextCursor
-		var nextCursor string
-		if len(umls) >= NUM_OF_ITEMS_PER_PAGE {
-			dsCursor, err := iter.Cursor()
-			if err == nil {
-				nextCursor = dsCursor.String()
-				log.Infof(ctx, "next cursor: %s", nextCursor)
-			}
-		}
+		log.Debugf(ctx, "next cursor: %s", nextCursor)
 
 		// TODO: マークアップが安定してきたら外に出す
-		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html", "templates/components/uml_list.html"))
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles(
+			"templates/base.html",
+			"templates/index.html",
+			"templates/components/uml_list.html",
+		))
 
-		err := tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
+		err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
 			CommonTemplateVars: &CommonTemplateVars{
 				GATrackingID: gaTrackingId,
 				Context:      ctx,
@@ -225,100 +149,33 @@ func init() {
 
 	router.Get("/search", func(w http.ResponseWriter, r *http.Request) {
 		ctx := appengine.NewContext(r)
-		queryWord := r.URL.Query().Get("q")
 
-		fts, err := search.Open("uml_source")
+		queryParams := r.URL.Query()
+		query := queryParams.Get("q")
+		cursor := queryParams.Get("cursor")
+
+		umls, nextCursor, err := SearchUmls(ctx, query, NUM_OF_ITEMS_PER_PAGE, cursor)
 		if err != nil {
-			log.Criticalf(ctx, "failed to open FTS: %s", err)
+			log.Criticalf(ctx, "%s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
-		options := search.SearchOptions{
-			Limit:   NUM_OF_ITEMS_PER_PAGE,
-			IDsOnly: true,
-		}
-
-		cursor := r.URL.Query().Get("cursor")
-		if cursor != "" {
-			options.Cursor = search.Cursor(cursor)
-		}
-
-		query := fmt.Sprintf("document = \"%s\"", queryWord)
-
-		var nextCursor string
-		var entityIds []int64
-		for iter := fts.Search(ctx, query, &options); ; {
-			id, err := iter.Next(nil)
-			if err == search.Done {
-				if len(entityIds) >= NUM_OF_ITEMS_PER_PAGE {
-					nextCursor = string(iter.Cursor())
-				}
-				break
-			}
-			if err != nil {
-				log.Criticalf(ctx, "FTS search unexpected error: %v", err)
-				break
-			}
-			intId, _ := strconv.ParseInt(id, 10, 64)
-			entityIds = append(entityIds, intId)
-		}
-		log.Infof(ctx, "query result: %v", entityIds)
-
-		keys := make([]*datastore.Key, len(entityIds))
-		for i, id := range entityIds {
-			keys[i] = datastore.NewKey(ctx, "Uml", "", id, nil)
-		}
-		umls := make([]Uml, len(keys))
-		notFounds := make([]bool, len(keys))
-
-		err = datastore.GetMulti(ctx, keys, umls)
-		if err != nil {
-			multiErr, ok := err.(appengine.MultiError)
-			if !ok {
-				log.Criticalf(ctx, "Datastore fetch error: %v", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			for i, e := range multiErr {
-				if e == nil {
-					continue
-				}
-				if e == datastore.ErrNoSuchEntity {
-					log.Warningf(ctx, "FTS index found, but datastore entity not found: %v", entityIds[i])
-					notFounds[i] = true
-					continue
-				}
-				log.Criticalf(ctx, "Datastore fetch partial error: %v", e)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-		}
-		var filteredUmls []Uml
-		for i, notFound := range notFounds {
-			if !notFound {
-				uml := umls[i]
-				// Set viewBox
-				var svgXml SvgXml
-				err = xml.Unmarshal([]byte(uml.Svg), &svgXml)
-				if err != nil {
-					log.Criticalf(ctx, "svg parse error: %v", err)
-				}
-				uml.SvgViewBox = svgXml.ViewBox
-				filteredUmls = append(filteredUmls, uml)
-			}
-		}
+		log.Debugf(ctx, "next cursor: %s", nextCursor)
 
 		// TODO: マークアップが安定してきたら外に出す
-		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/search.html", "templates/components/uml_list.html"))
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles(
+			"templates/base.html",
+			"templates/search.html",
+			"templates/components/uml_list.html",
+		))
 
 		err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
 			CommonTemplateVars: &CommonTemplateVars{
 				GATrackingID: gaTrackingId,
 				Context:      ctx,
-				Query:        queryWord,
+				Query:        query,
 			},
-			Umls:       filteredUmls,
+			Umls:       umls,
 			NextCursor: nextCursor,
 		})
 		if err != nil {
@@ -333,7 +190,10 @@ func init() {
 		w.WriteHeader(http.StatusNotFound)
 
 		// TODO: マークアップが安定してきたら外に出す
-		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/404.html"))
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles(
+			"templates/base.html",
+			"templates/404.html",
+		))
 		_ = tmpl.ExecuteTemplate(w, "base", struct {
 			*CommonTemplateVars
 		}{
