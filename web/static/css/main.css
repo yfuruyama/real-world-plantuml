@@ -79,6 +79,7 @@ main {
   vertical-align: top;
 }
 .uml__svg__modal__wrapper {
+  padding: 20px;
   background-color: #fff;
 }
 .uml__source {
