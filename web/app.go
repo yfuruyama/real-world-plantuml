@@ -310,7 +310,7 @@ func init() {
 		}
 
 		// TODO: マークアップが安定してきたら外に出す
-		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html", "templates/components/uml_list.html"))
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/search.html", "templates/components/uml_list.html"))
 
 		err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
 			CommonTemplateVars: &CommonTemplateVars{
