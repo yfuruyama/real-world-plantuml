@@ -81,6 +81,11 @@ func init() {
 			}
 			return text
 		},
+		"staticPath": func(filePath string) string {
+			// TODO: replace with official API
+			moduleVersion := os.Getenv("GAE_MODULE_VERSION")
+			return fmt.Sprintf("/static/%s?v=%s", filePath, moduleVersion)
+		},
 	}
 
 	handle404 := func(w http.ResponseWriter, r *http.Request) {
