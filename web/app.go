@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"html/template"
@@ -81,10 +82,8 @@ func init() {
 			}
 			return text
 		},
-		"staticPath": func(filePath string) string {
-			// TODO: replace with official API
-			moduleVersion := os.Getenv("GAE_MODULE_VERSION")
-			return fmt.Sprintf("/static/%s?v=%s", filePath, moduleVersion)
+		"staticPath": func(ctx context.Context, filePath string) string {
+			return fmt.Sprintf("/static/%s?v=%s", filePath, appengine.VersionID(ctx))
 		},
 	}
 
@@ -164,12 +163,14 @@ func init() {
 
 		err := tmpl.ExecuteTemplate(w, "base", struct {
 			*GlobalTemplateVars
+			Context    context.Context
 			Umls       []Uml
 			NextCursor string
 			Type       DiagramType
 			Query      string
 		}{
 			&globalTemplateVars,
+			ctx,
 			umls,
 			nextCursor,
 			typ,

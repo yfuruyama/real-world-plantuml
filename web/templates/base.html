@@ -2,10 +2,10 @@
 <html>
 <head>
   <title>Real World PlantUML</title>
-  <link rel="icon" type="image/x-icon" href='{{ staticPath "img/favicon.png" }}'>
+  <link rel="icon" type="image/x-icon" href='{{ staticPath .Context "img/favicon.png" }}'>
 
   <!-- CSS -->
-  <link rel="stylesheet" href='{{ staticPath "css/main.css" }}'>
+  <link rel="stylesheet" href='{{ staticPath .Context "css/main.css" }}'>
   <link rel="stylesheet" href="https://unpkg.com/material-components-web@0.27.0/dist/material-components-web.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
 
@@ -42,27 +42,27 @@
       <hr class="mdc-list-divider">
       <nav id="icon-with-text-demo" class="mdc-list">
         <a class='mdc-list-item {{ if eq .Type "sequence" }}diagram_type__selected{{ end }}' href="/?type=sequence">
-          <img class="diagram_type__icon" src='{{ staticPath "img/icons_sequence.png" }}'>
+          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_sequence.png" }}'>
           Sequence
         </a>
         <a class='mdc-list-item {{ if eq .Type "usecase" }}diagram_type__selected{{ end }}' href="/?type=usecase">
-          <img class="diagram_type__icon" src='{{ staticPath "img/icons_usecase.png" }}'>
+          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_usecase.png" }}'>
           Usecase
         </a>
         <a class='mdc-list-item {{ if eq .Type "class" }}diagram_type__selected{{ end }}' href="/?type=class">
-          <img class="diagram_type__icon" src='{{ staticPath "img/icons_class.png" }}'>
+          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_class.png" }}'>
           Class
         </a>
         <a class='mdc-list-item {{ if eq .Type "activity" }}diagram_type__selected{{ end }}' href="/?type=activity">
-          <img class="diagram_type__icon" src='{{ staticPath "img/icons_activity.png" }}'>
+          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_activity.png" }}'>
           Activity
         </a>
         <a class='mdc-list-item {{ if eq .Type "component" }}diagram_type__selected{{ end }}' href="/?type=component">
-          <img class="diagram_type__icon" src='{{ staticPath "img/icons_component.png" }}'>
+          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_component.png" }}'>
           Component
         </a>
         <a class='mdc-list-item {{ if eq .Type "state" }}diagram_type__selected{{ end }}' href="/?type=state">
-          <img class="diagram_type__icon" src='{{ staticPath "img/icons_state.png" }}'>
+          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_state.png" }}'>
           State
         </a>
       </nav>
