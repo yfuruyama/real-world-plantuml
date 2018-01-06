@@ -51,20 +51,23 @@ type FTSDocument struct {
 	Document string `search:"document"`
 }
 
-type UmlListTemplateVars struct {
+type CommonTemplateVars struct {
 	GATrackingID string
 	Context      context.Context
-	Umls         []Uml
-	NextCursor   string
-	Type         DiagramType
+	DiagramType  DiagramType
 	Query        string
+}
+
+type UmlListTemplateVars struct {
+	*CommonTemplateVars
+	Umls       []Uml
+	NextCursor string
 }
 
 const NUM_OF_ITEMS_PER_PAGE = 10
 
 func init() {
 	gaTrackingId := os.Getenv("GA_TRACKING_ID")
-	globalTemplateVars := GlobalTemplateVars{gaTrackingId}
 
 	funcMap := template.FuncMap{
 		"safehtml": func(text string) template.HTML {
@@ -94,18 +97,6 @@ func init() {
 		"staticPath": func(ctx context.Context, filePath string) string {
 			return fmt.Sprintf("/static/%s?v=%s", filePath, appengine.VersionID(ctx))
 		},
-	}
-
-	handle404 := func(w http.ResponseWriter, r *http.Request) {
-		// TODO: マークアップが安定してきたら外に出す
-		tmpl := template.Must(template.New("").ParseFiles("templates/base.html", "templates/404.html"))
-		_ = tmpl.ExecuteTemplate(w, "base", struct {
-			*GlobalTemplateVars
-		}{
-			&globalTemplateVars,
-		})
-		w.WriteHeader(http.StatusNotFound)
-		return
 	}
 
 	router := chi.NewRouter()
@@ -171,11 +162,13 @@ func init() {
 		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html", "templates/components/uml_list.html"))
 
 		err := tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
-			GATrackingID: gaTrackingId,
-			Context:      ctx,
-			Umls:         umls,
-			NextCursor:   nextCursor,
-			Type:         typ,
+			CommonTemplateVars: &CommonTemplateVars{
+				GATrackingID: gaTrackingId,
+				Context:      ctx,
+				DiagramType:  typ,
+			},
+			Umls:       umls,
+			NextCursor: nextCursor,
 		})
 		if err != nil {
 			log.Criticalf(ctx, "%s", err)
@@ -184,41 +177,41 @@ func init() {
 		}
 	})
 
-	router.Get("/umls/{umlID:\\d+}", func(w http.ResponseWriter, r *http.Request) {
-		ctx := appengine.NewContext(r)
-		umlID, _ := strconv.ParseInt(chi.URLParam(r, "umlID"), 10, 64)
-		key := datastore.NewKey(ctx, "Uml", "", umlID, nil)
+	// router.Get("/umls/{umlID:\\d+}", func(w http.ResponseWriter, r *http.Request) {
+	// ctx := appengine.NewContext(r)
+	// umlID, _ := strconv.ParseInt(chi.URLParam(r, "umlID"), 10, 64)
+	// key := datastore.NewKey(ctx, "Uml", "", umlID, nil)
 
-		var uml Uml
-		err := datastore.Get(ctx, key, &uml)
-		if err != nil {
-			if err == datastore.ErrNoSuchEntity {
-				log.Warningf(ctx, "Uml not found: %v", umlID)
-				handle404(w, r)
-				return
-			}
+	// var uml Uml
+	// err := datastore.Get(ctx, key, &uml)
+	// if err != nil {
+	// if err == datastore.ErrNoSuchEntity {
+	// log.Warningf(ctx, "Uml not found: %v", umlID)
+	// handle404(w, r)
+	// return
+	// }
 
-			log.Criticalf(ctx, "Unexpected datastore error: %s", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	// log.Criticalf(ctx, "Unexpected datastore error: %s", err)
+	// w.WriteHeader(http.StatusInternalServerError)
+	// return
+	// }
 
-		// TODO: マークアップが安定してきたら外に出す
-		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/uml.html"))
+	// // TODO: マークアップが安定してきたら外に出す
+	// tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/uml.html"))
 
-		err = tmpl.ExecuteTemplate(w, "base", struct {
-			*GlobalTemplateVars
-			Uml Uml
-		}{
-			&globalTemplateVars,
-			uml,
-		})
-		if err != nil {
-			log.Criticalf(ctx, "%s", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-	})
+	// err = tmpl.ExecuteTemplate(w, "base", struct {
+	// *GlobalTemplateVars
+	// Uml Uml
+	// }{
+	// &globalTemplateVars,
+	// uml,
+	// })
+	// if err != nil {
+	// log.Criticalf(ctx, "%s", err)
+	// w.WriteHeader(http.StatusInternalServerError)
+	// return
+	// }
+	// })
 
 	router.Get("/search", func(w http.ResponseWriter, r *http.Request) {
 		ctx := appengine.NewContext(r)
@@ -310,11 +303,13 @@ func init() {
 		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html", "templates/components/uml_list.html"))
 
 		err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
-			GATrackingID: gaTrackingId,
-			Context:      ctx,
-			Umls:         filteredUmls,
-			NextCursor:   nextCursor,
-			Query:        queryWord,
+			CommonTemplateVars: &CommonTemplateVars{
+				GATrackingID: gaTrackingId,
+				Context:      ctx,
+				Query:        queryWord,
+			},
+			Umls:       filteredUmls,
+			NextCursor: nextCursor,
 		})
 		if err != nil {
 			log.Criticalf(ctx, "%s", err)
@@ -323,7 +318,22 @@ func init() {
 		}
 	})
 
-	router.NotFound(handle404)
+	router.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		ctx := appengine.NewContext(r)
+		w.WriteHeader(http.StatusNotFound)
+
+		// TODO: マークアップが安定してきたら外に出す
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/404.html"))
+		_ = tmpl.ExecuteTemplate(w, "base", struct {
+			*CommonTemplateVars
+		}{
+			CommonTemplateVars: &CommonTemplateVars{
+				GATrackingID: gaTrackingId,
+				Context:      ctx,
+			},
+		})
+		return
+	})
 
 	http.Handle("/", router)
 }
