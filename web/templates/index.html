@@ -1,48 +1,9 @@
 {{define "content"}}
-<ul>
-{{ range $i, $uml := .Umls }}
-  <li>
-    <div class="uml" data-uml-id="{{ $uml.ID }}" data-uml-diagram-type="{{ $uml.DiagramType }}">
-      <div class="uml__svg uml__svg__modal__{{$uml.ID}}_open">
-        <svg viewBox="{{ $uml.SvgViewBox }}" class="uml__svg__wrapper">{{ $uml.Svg | safehtml }}</svg>
-      </div>
-      <div id="uml__svg__modal__{{$uml.ID}}" style="display:none"><div class="uml__svg__modal__wrapper">{{ $uml.Svg | safehtml }}</div></div>
-      <div class="uml__source">
-        <div class="uml__source__header">
-          <div class="uml__source__header__ref"><a href="{{ $uml.GitHubUrl }}" target="_blank">{{ $uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
-          <button class="uml__source__header__copy" data-clipboard-text="{{ $uml.Source }}">Copy</button>
-        </div>
-        <pre class="uml__source__content">{{ $uml.Source }}<span class="uml__source__content__line_numbers">{{ range loopLineTimes $uml.Source }}<span></span>{{ end }}</span></pre>
-      </div>
-    </div>
-  </li>
-{{ end }}
-</ul>
+
+{{template "uml_list" .}}
 
 {{ if .NextCursor }}
-  {{ if .Query }}
-    <div><a href="/search?q={{ .Query }}&cursor={{ .NextCursor }}">Next</a></div>
-  {{ else }}
-    <div><a href="/?cursor={{ .NextCursor }}{{ if .Type }}&type={{ .Type }}{{ end }}">Next</a></div>
-  {{ end }}
+  <div><a href="/?cursor={{ .NextCursor }}{{ if .Type }}&type={{ .Type }}{{ end }}">Next</a></div>
 {{ end }}
 
-<script>
-  // setup source copy 
-  var clipboard = new Clipboard('.uml__source__header__copy');
-  clipboard.on('success', function(e) {
-    var orig = e.trigger.innerText;
-    e.trigger.innerText = "Copied!";
-    setTimeout(function() {
-      e.trigger.innerText = orig;
-    }, 1000);
-  });
-
-  // setup modal
-  $('.uml').each(function(i, elem) {
-    $('#uml__svg__modal__' + elem.dataset.umlId).popup({
-      opacity: 0.7,
-    });
-  });
-</script>
 {{ end }}

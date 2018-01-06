@@ -51,6 +51,15 @@ type FTSDocument struct {
 	Document string `search:"document"`
 }
 
+type UmlListTemplateVars struct {
+	GATrackingID string
+	Context      context.Context
+	Umls         []Uml
+	NextCursor   string
+	Type         DiagramType
+	Query        string
+}
+
 const NUM_OF_ITEMS_PER_PAGE = 10
 
 func init() {
@@ -159,22 +168,14 @@ func init() {
 		}
 
 		// TODO: マークアップが安定してきたら外に出す
-		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html"))
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html", "templates/components/uml_list.html"))
 
-		err := tmpl.ExecuteTemplate(w, "base", struct {
-			*GlobalTemplateVars
-			Context    context.Context
-			Umls       []Uml
-			NextCursor string
-			Type       DiagramType
-			Query      string
-		}{
-			&globalTemplateVars,
-			ctx,
-			umls,
-			nextCursor,
-			typ,
-			"",
+		err := tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
+			GATrackingID: gaTrackingId,
+			Context:      ctx,
+			Umls:         umls,
+			NextCursor:   nextCursor,
+			Type:         typ,
 		})
 		if err != nil {
 			log.Criticalf(ctx, "%s", err)
@@ -306,20 +307,14 @@ func init() {
 		}
 
 		// TODO: マークアップが安定してきたら外に出す
-		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html"))
+		tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/index.html", "templates/components/uml_list.html"))
 
-		err = tmpl.ExecuteTemplate(w, "base", struct {
-			*GlobalTemplateVars
-			Umls       []Uml
-			NextCursor string
-			Type       DiagramType
-			Query      string
-		}{
-			&globalTemplateVars,
-			filteredUmls,
-			nextCursor,
-			"",
-			queryWord,
+		err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
+			GATrackingID: gaTrackingId,
+			Context:      ctx,
+			Umls:         filteredUmls,
+			NextCursor:   nextCursor,
+			Query:        queryWord,
 		})
 		if err != nil {
 			log.Criticalf(ctx, "%s", err)

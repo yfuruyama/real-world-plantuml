@@ -5,24 +5,25 @@
   <link rel="icon" type="image/x-icon" href='{{ staticPath .Context "img/favicon.png" }}'>
 
   <!-- CSS -->
-  <link rel="stylesheet" href='{{ staticPath .Context "css/main.css" }}'>
   <link rel="stylesheet" href="https://unpkg.com/material-components-web@0.27.0/dist/material-components-web.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+  <link rel="stylesheet" href='{{ staticPath .Context "css/main.css" }}'>
 
   <!-- JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
   <script type="text/javascript" src="https://unpkg.com/material-components-web@0.27.0/dist/material-components-web.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-popup-overlay/1.7.9/jquery.popupoverlay.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-popup-overlay/1.7.9/jquery.popupoverlay.min.js"></script>
+  <script type="text/javascript" src='{{ staticPath .Context "js/main.js" }}'></script>
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id={{.GA_TRACKING_ID}}"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{.GATrackingID}}"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    gtag('config', '{{.GA_TRACKING_ID}}');
+    gtag('config', '{{.GATrackingID}}');
   </script>
 </head>
 <body class="mdc-typography">
