@@ -44,6 +44,7 @@ body {
 main {
   padding-left: 16px;
   width: 100%;
+  min-width: 900px;
   /* height: 100%; */
   /* overflow: auto; */
 }
@@ -65,6 +66,7 @@ main {
   padding: 10px;
   vertical-align: top;
   width: 300px;
+  cursor: pointer;
 }
 .uml__svg__wrapper {
   width: 300px;
@@ -75,6 +77,9 @@ main {
   border: solid 1px #aaa;
   padding: 10px;
   vertical-align: top;
+}
+.uml__svg__modal__wrapper {
+  background-color: #fff;
 }
 .uml__source {
   display: inline-block;
