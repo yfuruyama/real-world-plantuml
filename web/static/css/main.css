@@ -45,7 +45,7 @@ body {
 
 main {
   padding-left: 16px;
-  width: 100%;
+  width: 900px;
   min-width: 900px;
   margin: 0 0 60px 0;
   /* height: 100%; */
@@ -61,11 +61,11 @@ main {
 }
 
 .uml {
-  margin: 10px 0 20px 0;
+  margin: 15px 0 15px 0;
 }
 .uml__svg {
   display: inline-block;
-  border: solid 1px #aaa;
+  /* border: solid 1px #aaa; */
   padding: 10px;
   vertical-align: top;
   width: 300px;
@@ -87,7 +87,7 @@ main {
 }
 .uml__source {
   display: inline-block;
-  margin: 0 0 10px 20px;
+  margin: 0 0 0 20px;
   width: 500px;
   /* height: 300px; */
   border: 1px solid #999;
@@ -165,6 +165,10 @@ main {
 
 ul {
 	list-style: none;
+}
+
+li {
+  border-bottom: 1px solid #ccc;
 }
 
 li:nth-child(2n+1) {
