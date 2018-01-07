@@ -90,11 +90,11 @@ func NewHandler(gaTrackingID string) *Handler {
 			if word == "" {
 				return code
 			}
-			re, err := regexp.Compile(word)
+			re, err := regexp.Compile(fmt.Sprintf("(?i)(%s)", word))
 			if err != nil {
 				return code
 			}
-			return re.ReplaceAllString(code, fmt.Sprintf("<mark>%s</mark>", word))
+			return re.ReplaceAllString(code, "<mark>$1</mark>")
 		},
 	}
 
