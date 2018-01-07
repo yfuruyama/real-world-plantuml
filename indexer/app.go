@@ -27,8 +27,14 @@ type GitHubContentResponse struct {
 func init() {
 	router := chi.NewRouter()
 
-	router.Post("/indexer/create", func(w http.ResponseWriter, r *http.Request) {
+	router.Post("/index", func(w http.ResponseWriter, r *http.Request) {
 		ctx := appengine.NewContext(r)
+
+		if r.Header.Get("X-AppEngine-QueueName") == "" {
+			log.Warningf(ctx, "Request is not from TaskQueue")
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
 
 		decoder := json.NewDecoder(r.Body)
 		var body IndexCreateRequestBody

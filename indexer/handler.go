@@ -95,7 +95,7 @@ func HandleGcsNotification(w http.ResponseWriter, r *http.Request) {
 		}
 
 		task := &taskqueue.Task{
-			Path:    "/indexer/create",
+			Path:    "/index",
 			Payload: bodyBytes,
 			Header:  header,
 			Method:  "POST",
