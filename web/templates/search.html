@@ -1,9 +1,15 @@
 {{define "content"}}
 
-{{template "uml_list" .}}
+{{ if .Umls }}
+  {{template "uml_list" .}}
 
-{{ if .NextCursor }}
-  <div><a href="/search?q={{ .Query }}&cursor={{ .NextCursor }}">Next</a></div>
+  {{ if .NextCursor }}
+    <div><a href="/search?q={{ .Query }}&cursor={{ .NextCursor }}">Next</a></div>
+  {{ end }}
+{{ else }}
+  <div class="error">
+    No results found.
+  </div>
 {{ end }}
 
 {{ end }}
