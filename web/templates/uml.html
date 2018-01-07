@@ -1,11 +1,7 @@
 {{define "content"}}
-<div class="uml">
-  <div class="uml__svg--raw">
-    {{ .Uml.Svg | safehtml }}
-  </div>
-  <div class="uml__source">
-    <pre class="uml__source__box">{{ .Uml.Source }}<span class="uml__source__line_numbers">{{ range loopLineTimes .Uml.Source }}<span></span>{{ end }}</span></pre>
-    <div class="uml__ref"><a href="{{ .Uml.GitHubUrl }}">{{ .Uml.GitHubUrl | githubUrlToAnchorText }}</a></div>
-  </div>
-</div>
+
+{{with .Uml}}
+  {{template "uml_item" .}}
+{{end}}
+
 {{end}}

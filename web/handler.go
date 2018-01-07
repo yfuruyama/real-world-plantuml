@@ -6,7 +6,10 @@ import (
 	"html/template"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
+
+	"github.com/go-chi/chi"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
@@ -23,7 +26,7 @@ type CommonTemplateVars struct {
 
 type UmlListTemplateVars struct {
 	*CommonTemplateVars
-	Umls       []Uml
+	Umls       []*Uml
 	NextCursor string
 }
 
@@ -122,6 +125,7 @@ func (h *Handler) GetIndex(w http.ResponseWriter, r *http.Request) error {
 		"templates/base.html",
 		"templates/index.html",
 		"templates/components/uml_list.html",
+		"templates/components/uml_item.html",
 	))
 
 	err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
@@ -162,6 +166,7 @@ func (h *Handler) GetSearch(w http.ResponseWriter, r *http.Request) error {
 		"templates/base.html",
 		"templates/search.html",
 		"templates/components/uml_list.html",
+		"templates/components/uml_item.html",
 	))
 
 	err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
@@ -180,42 +185,42 @@ func (h *Handler) GetSearch(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// func (h *Handler) GetUml(w http.ResponseWriter, r *http.Request) error {
-// ctx := appengine.NewContext(r)
-// umlID, _ := strconv.ParseInt(chi.URLParam(r, "umlID"), 10, 64)
-// key := datastore.NewKey(ctx, "Uml", "", umlID, nil)
+func (h *Handler) GetUml(w http.ResponseWriter, r *http.Request) error {
+	ctx := appengine.NewContext(r)
+	umlID, _ := strconv.ParseInt(chi.URLParam(r, "umlID"), 10, 64)
 
-// var uml Uml
-// err := datastore.Get(ctx, key, &uml)
-// if err != nil {
-// if err == datastore.ErrNoSuchEntity {
-// log.Warningf(ctx, "Uml not found: %v", umlID)
-// handle404(w, r)
-// return
-// }
+	uml, err := FetchUmlById(ctx, umlID)
+	if err != nil {
+		return err
+	}
 
-// log.Criticalf(ctx, "Unexpected datastore error: %s", err)
-// w.WriteHeader(http.StatusInternalServerError)
-// return
-// }
+	if uml == nil {
+		return h.NotFound(w, r)
+	}
 
-// // TODO: マークアップが安定してきたら外に出す
-// tmpl := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/base.html", "templates/uml.html"))
+	// TODO: マークアップが安定してきたら外に出す
+	tmpl := template.Must(template.New("").Funcs(h.FuncMap).ParseFiles(
+		"templates/base.html",
+		"templates/uml.html",
+		"templates/components/uml_item.html",
+	))
 
-// err = tmpl.ExecuteTemplate(w, "base", struct {
-// *GlobalTemplateVars
-// Uml Uml
-// }{
-// &globalTemplateVars,
-// uml,
-// })
-// if err != nil {
-// log.Criticalf(ctx, "%s", err)
-// w.WriteHeader(http.StatusInternalServerError)
-// return
-// }
-// })
-// }
+	err = tmpl.ExecuteTemplate(w, "base", struct {
+		*CommonTemplateVars
+		Uml Uml
+	}{
+		CommonTemplateVars: &CommonTemplateVars{
+			GATrackingID: h.GATrackingID,
+			Context:      ctx,
+		},
+		Uml: *uml,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (h *Handler) NotFound(w http.ResponseWriter, r *http.Request) error {
 	ctx := appengine.NewContext(r)

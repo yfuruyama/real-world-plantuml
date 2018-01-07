@@ -14,8 +14,8 @@ func init() {
 	router := chi.NewRouter()
 	router.Get("/", handler.ToHandlerFunc(handler.GetIndex))
 	router.Get("/search", handler.ToHandlerFunc(handler.GetSearch))
+	router.Get("/umls/{umlID:\\d+}", handler.ToHandlerFunc(handler.GetUml))
 	router.NotFound(handler.ToHandlerFunc(handler.NotFound))
-	// router.Get("/umls/{umlID:\\d+}", handler.ToHandlerFunc(handler.GetUml))
 
 	http.Handle("/", router)
 }

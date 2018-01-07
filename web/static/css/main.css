@@ -61,7 +61,7 @@ main {
 }
 
 .uml {
-  margin: 15px 0 15px 0;
+  margin: 15px 0 0 0;
 }
 .uml__svg {
   display: inline-block;
@@ -162,9 +162,18 @@ main {
   padding-right: .8em;
   text-align: right;
 }
+.uml__detail_link {
+  margin: 0 0 15px 10px;
+}
+.uml__detail_link>a {
+  /* text-decoration: none; */
+  color: #950029;
+}
 
 ul {
-	list-style: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 li {

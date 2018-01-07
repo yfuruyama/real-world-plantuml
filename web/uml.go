@@ -13,14 +13,15 @@ import (
 )
 
 type Uml struct {
-	ID          int64       `datastore:"-"`
-	GitHubUrl   string      `datastore:"gitHubUrl"`
-	Source      string      `datastore:"source,noindex"`
-	DiagramType DiagramType `datastore:"diagramType"`
-	Svg         string      `datastore:"svg,noindex"`
-	SvgViewBox  string      `datastore:"-"`
-	PngBase64   string      `datastore:"pngBase64,noindex"`
-	Ascii       string      `datastore:"ascii,noindex"`
+	ID            int64       `datastore:"-"`
+	GitHubUrl     string      `datastore:"gitHubUrl"`
+	Source        string      `datastore:"source,noindex"`
+	DiagramType   DiagramType `datastore:"diagramType"`
+	Svg           string      `datastore:"svg,noindex"`
+	SvgViewBox    string      `datastore:"-"`
+	PngBase64     string      `datastore:"pngBase64,noindex"`
+	Ascii         string      `datastore:"ascii,noindex"`
+	HighlightWord string      `datastore:"-"`
 }
 
 type SvgXml struct {
@@ -38,7 +39,25 @@ const (
 	TypeState     DiagramType = "state"
 )
 
-func FetchUmls(ctx context.Context, typ DiagramType, count int, cursor string) ([]Uml, string, error) {
+func (d DiagramType) String() string {
+	switch d {
+	case TypeSequence:
+		return "Sequence"
+	case TypeUsecase:
+		return "Usecase"
+	case TypeClass:
+		return "Class"
+	case TypeActivity:
+		return "Activity"
+	case TypeComponent:
+		return "Component"
+	case TypeState:
+		return "State"
+	}
+	return ""
+}
+
+func FetchUmls(ctx context.Context, typ DiagramType, count int, cursor string) ([]*Uml, string, error) {
 	q := datastore.NewQuery("Uml").Limit(count).KeysOnly()
 
 	// Set filter
@@ -86,7 +105,15 @@ func FetchUmls(ctx context.Context, typ DiagramType, count int, cursor string) (
 	return umls, nextCursor, nil
 }
 
-func SearchUmls(ctx context.Context, queryWord string, count int, cursor string) ([]Uml, string, error) {
+func FetchUmlById(ctx context.Context, id int64) (*Uml, error) {
+	umls, err := fetchUmlsByIds(ctx, []int64{id})
+	if err != nil || len(umls) == 0 {
+		return nil, err
+	}
+	return umls[0], nil
+}
+
+func SearchUmls(ctx context.Context, queryWord string, count int, cursor string) ([]*Uml, string, error) {
 	fts, err := search.Open("uml_source")
 	if err != nil {
 		log.Criticalf(ctx, "failed to open FTS: %s", err)
@@ -126,15 +153,21 @@ func SearchUmls(ctx context.Context, queryWord string, count int, cursor string)
 	}
 
 	umls, err := fetchUmlsByIds(ctx, ids)
+
+	// for rendering
+	for _, uml := range umls {
+		uml.HighlightWord = queryWord
+	}
+
 	return umls, nextCursor, err
 }
 
-func fetchUmlsByIds(ctx context.Context, ids []int64) ([]Uml, error) {
+func fetchUmlsByIds(ctx context.Context, ids []int64) ([]*Uml, error) {
 	keys := make([]*datastore.Key, len(ids))
 	for i, id := range ids {
 		keys[i] = datastore.NewKey(ctx, "Uml", "", id, nil)
 	}
-	umls := make([]Uml, len(keys))
+	umls := make([]*Uml, len(keys))
 	notFounds := make([]bool, len(keys))
 
 	err := datastore.GetMulti(ctx, keys, umls)
@@ -158,7 +191,7 @@ func fetchUmlsByIds(ctx context.Context, ids []int64) ([]Uml, error) {
 		}
 	}
 
-	var foundUmls []Uml
+	var foundUmls []*Uml
 	for i, notFound := range notFounds {
 		if !notFound {
 			uml := umls[i]
