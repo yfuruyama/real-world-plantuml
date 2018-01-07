@@ -3,8 +3,8 @@ package web
 import (
 	"context"
 	"encoding/xml"
-	"fmt"
 	"strconv"
+	"strings"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
@@ -129,7 +129,7 @@ func SearchUmls(ctx context.Context, queryWord string, count int, cursor string)
 		options.Cursor = search.Cursor(cursor)
 	}
 
-	query := fmt.Sprintf("document = \"%s\"", queryWord)
+	query := strings.Join(strings.Split(queryWord, " "), " AND ")
 
 	var ids []int64
 	iter := fts.Search(ctx, query, &options)
@@ -140,7 +140,7 @@ func SearchUmls(ctx context.Context, queryWord string, count int, cursor string)
 		}
 		if err != nil {
 			log.Criticalf(ctx, "FTS search unexpected error: %v", err)
-			return nil, "", err
+			break
 		}
 		intId, _ := strconv.ParseInt(id, 10, 64)
 		ids = append(ids, intId)
