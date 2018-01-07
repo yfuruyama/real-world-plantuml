@@ -147,6 +147,10 @@ func (h *Handler) GetSearch(w http.ResponseWriter, r *http.Request) error {
 	query := queryParams.Get("q")
 	cursor := queryParams.Get("cursor")
 
+	if query == "" {
+		return h.GetIndex(w, r)
+	}
+
 	umls, nextCursor, err := SearchUmls(ctx, query, NUM_OF_ITEMS_PER_PAGE, cursor)
 	if err != nil {
 		return err
