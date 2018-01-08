@@ -1,0 +1,49 @@
+@startuml
+cloud {
+    [GitHub] as github
+}
+
+package "Local Machine" {
+    [nodejs] as scrape
+}
+
+package "GCP" {
+    database "Cloud Datastore" as datastore {
+        [entity]
+    }
+    
+    database "Cloud Storage" as gcs {
+        [bucket]
+    }
+
+    node "App Engine" {
+        frame "Standard" {
+            [indexer]
+            [web]
+        }
+        frame "Flexible" {
+            [syntax_checker]
+            [renderer]
+        }
+        database "TaskQueue" as taskqueue {
+            [index-create-queue] as queue
+        }
+        [Search API] as searchapi
+    }
+}
+
+actor User as user
+
+scrape --> github : 1. scraping
+scrape -r-> bucket : 2. put GitHub urls
+bucket -d-> indexer : 3. notification
+indexer -l-> queue : 4. put task
+queue -r-> indexer : 5. execute task
+indexer --> syntax_checker : 6. syntax check
+indexer --> renderer : 7. rendering
+indexer -u-> entity : 8. put
+web -u-> entity : 9. get
+web -d-> searchapi : 10. search
+web -r-> user : 11. show web page
+
+@enduml

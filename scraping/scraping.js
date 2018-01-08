@@ -45,8 +45,9 @@ async function scrape(searchWord) {
 const searchWords = [
   'startuml enduml size:>100 license:mit language:Text',
   'startuml enduml size:>100 license:mit language:Markdown',
-  'startuml enduml size:>100 license:apache-2.0 language:Text',
-  'startuml enduml size:>100 license:apache-2.0 language:Markdown',
+  'startuml enduml size:>100 license:mit extension:puml',
+  'startuml enduml size:>100 license:mit extension:uml',
+  'startuml enduml size:>100 license:mit extension:plantuml',
 ];
 
 (async function() {
