@@ -4,7 +4,7 @@
 {{range .Umls}}
   <li>
     {{template "uml_item" .}}
-    <div class="uml__detail_link"><a href="/umls/{{ .ID }}">{{ .DiagramType }} diagram ({{ .ID }})</a></div>
+    <div class="uml__detail_link"><a href="/umls/{{ .ID }}">{{ .DiagramType.ToHumanString }} diagram ({{ .ID }})</a></div>
   </li>
 {{end}}
 </ul>

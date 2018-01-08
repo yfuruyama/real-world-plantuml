@@ -39,7 +39,7 @@ const (
 	TypeState     DiagramType = "state"
 )
 
-func (d DiagramType) String() string {
+func (d DiagramType) ToHumanString() string {
 	switch d {
 	case TypeSequence:
 		return "Sequence"
