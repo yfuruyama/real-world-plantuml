@@ -2,6 +2,7 @@ package indexer
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 	"strings"
@@ -24,12 +25,13 @@ type Indexer struct {
 }
 
 type Uml struct {
-	GitHubUrl   string      `datastore:"gitHubUrl"`
-	Source      string      `datastore:"source,noindex"`
-	DiagramType DiagramType `datastore:"diagramType"`
-	Svg         string      `datastore:"svg,noindex"`
-	PngBase64   string      `datastore:"pngBase64,noindex"`
-	Ascii       string      `datastore:"ascii,noindex"`
+	GitHubUrl    string      `datastore:"gitHubUrl"`
+	Source       string      `datastore:"source,noindex"`
+	SourceSHA256 string      `datastore:"sourceSHA256"`
+	DiagramType  DiagramType `datastore:"diagramType"`
+	Svg          string      `datastore:"svg,noindex"`
+	PngBase64    string      `datastore:"pngBase64,noindex"`
+	Ascii        string      `datastore:"ascii,noindex"`
 }
 
 type DiagramType string
@@ -148,6 +150,8 @@ func (idxr *Indexer) Process() error {
 
 	for _, source := range sources {
 		log.Infof(ctx, "process source: %s", source)
+
+		sourceHash = string(sha256.Sum256([]byte(source)))
 
 		result, err := syntaxChecker.CheckSyntax(source)
 		if err != nil {
