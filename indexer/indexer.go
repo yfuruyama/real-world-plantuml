@@ -83,42 +83,6 @@ func (idxr *Indexer) CreateIndexes(ctx context.Context, text string, gitHubUrl s
 	renderer := idxr.Renderer
 	syntaxChecker := idxr.SyntaxChecker
 
-	fts, err := search.Open("uml_source")
-	if err != nil {
-		log.Criticalf(ctx, "failed to open FTS: %s", err)
-		return err
-	}
-
-	// TODO: txn
-	// Delete entities
-	var oldUmls []Uml
-	q := datastore.NewQuery("Uml").Filter("gitHubUrl =", gitHubUrl)
-	keys, err := q.GetAll(ctx, &oldUmls)
-	if err != nil {
-		log.Criticalf(ctx, "failed to fetch old umls: %v", err)
-		return err
-	}
-	if len(keys) > 0 {
-		log.Infof(ctx, "there are old umls found, so delete them: %v", keys)
-		if err := datastore.DeleteMulti(ctx, keys); err != nil {
-			log.Criticalf(ctx, "failed to delete old umls: %v", err)
-			return err
-		}
-
-		// Delete index from full-text search
-		for _, key := range keys {
-			err = fts.Delete(ctx, fmt.Sprintf("%d", key.IntID()))
-			if err == nil {
-				log.Infof(ctx, "deleted document from FTS: %v", key.IntID())
-			} else {
-				if err != search.ErrNoSuchDocument {
-					log.Criticalf(ctx, "failed to delete document from FTS: %s", err)
-					return err
-				}
-			}
-		}
-	}
-
 	sources := findSources(ctx, text)
 	for _, source := range sources {
 		log.Infof(ctx, "process source: %s", source)
@@ -130,6 +94,18 @@ func (idxr *Indexer) CreateIndexes(ctx context.Context, text string, gitHubUrl s
 		hash := sha256.Sum256([]byte(source))
 		sourceHash := hex.EncodeToString(hash[:])
 		log.Debugf(ctx, "source hash: %s", sourceHash)
+
+		var existing []Uml
+		q := datastore.NewQuery("Uml").Filter("sourceSHA256 =", sourceHash).Limit(1)
+		_, err := q.GetAll(ctx, &existing)
+		if err != nil {
+			log.Criticalf(ctx, "failed to fetch existing umls: %v", err)
+			return err
+		}
+		if len(existing) == 1 {
+			log.Infof(ctx, "there is same uml existing: %#v", existing[0])
+			continue
+		}
 
 		result, err := syntaxChecker.CheckSyntax(source)
 		if err != nil {
@@ -170,12 +146,13 @@ func (idxr *Indexer) CreateIndexes(ctx context.Context, text string, gitHubUrl s
 
 		log.Infof(ctx, "make index: type=%s, svg=%s, pngBase64=%s, ascii=%s", typ, svg, pngBase64, ascii)
 		uml := &Uml{
-			GitHubUrl:   gitHubUrl,
-			Source:      source,
-			DiagramType: typ,
-			Svg:         svg,
-			PngBase64:   pngBase64,
-			Ascii:       ascii,
+			GitHubUrl:    gitHubUrl,
+			Source:       source,
+			SourceSHA256: sourceHash,
+			DiagramType:  typ,
+			Svg:          svg,
+			PngBase64:    pngBase64,
+			Ascii:        ascii,
 		}
 
 		key := datastore.NewIncompleteKey(ctx, "Uml", nil)
@@ -188,6 +165,11 @@ func (idxr *Indexer) CreateIndexes(ctx context.Context, text string, gitHubUrl s
 		// Register to full-text search index
 		doc := FTSDocument{
 			Document: source,
+		}
+		fts, err := search.Open("uml_source")
+		if err != nil {
+			log.Criticalf(ctx, "failed to open FTS: %s", err)
+			return err
 		}
 		_, err = fts.Put(ctx, fmt.Sprintf("%d", key.IntID()), &doc)
 		if err != nil {
