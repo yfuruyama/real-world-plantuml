@@ -1,3 +1,5 @@
+.PHONY: test
+
 PORT=8083
 API_PORT=8084
 ADMIN_PORT=8085
@@ -12,7 +14,7 @@ all:
 	test
 
 test:
-	echo "TBD"
+	go test -v ./...
 
 run:
 	GITHUB_API_TOKEN=$(GITHUB_API_TOKEN) RENDERER_BASE_URL=$(RENDERER_BASE_URL) SYNTAX_CHECKER_BASE_URL=$(SYNTAX_CHECKER_BASE_URL) go run ../util/gen_app_yaml.go --in app.yaml --out app.dist.yaml 

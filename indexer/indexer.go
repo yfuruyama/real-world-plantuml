@@ -18,11 +18,8 @@ const (
 )
 
 type Indexer struct {
-	GitHubUrl     string
-	Content       string
 	Renderer      *Renderer
 	SyntaxChecker *SyntaxChecker
-	ctx           context.Context
 }
 
 type Uml struct {
@@ -75,41 +72,14 @@ func guessDiagramType(source string, result *SyntaxCheckResult) DiagramType {
 	}
 }
 
-func NewIndexer(ctx context.Context, renderer *Renderer, syntaxChecker *SyntaxChecker, gitHubUrl string, content string) (*Indexer, error) {
+func NewIndexer(renderer *Renderer, syntaxChecker *SyntaxChecker) *Indexer {
 	return &Indexer{
-		Content:       content,
 		Renderer:      renderer,
 		SyntaxChecker: syntaxChecker,
-		GitHubUrl:     gitHubUrl,
-		ctx:           ctx,
-	}, nil
-}
-
-func (idxr *Indexer) FindSources() []string {
-	sources := make([]string, 0)
-	content := idxr.Content
-	for {
-		startIdx := strings.Index(content, "@startuml")
-		endIdx := strings.Index(content, "@enduml")
-		log.Debugf(idxr.ctx, "length:%d, startIdx:%d, endIdx:%d", len(content), startIdx, endIdx)
-		if startIdx == -1 || endIdx == -1 {
-			break
-		}
-		if startIdx < endIdx {
-			source := fmt.Sprintf("%s@enduml", content[startIdx:endIdx])
-			if len(source) >= MINIMUM_UML_SOURCE_LENGTH {
-				sources = append(sources, source)
-			}
-		}
-
-		content = content[(endIdx + len("@enduml")):]
 	}
-	return sources
 }
 
-func (idxr *Indexer) Process() error {
-	ctx := idxr.ctx
-	sources := idxr.FindSources()
+func (idxr *Indexer) CreateIndexes(ctx context.Context, text string, gitHubUrl string) error {
 	renderer := idxr.Renderer
 	syntaxChecker := idxr.SyntaxChecker
 
@@ -122,7 +92,7 @@ func (idxr *Indexer) Process() error {
 	// TODO: txn
 	// Delete entities
 	var oldUmls []Uml
-	q := datastore.NewQuery("Uml").Filter("gitHubUrl =", idxr.GitHubUrl)
+	q := datastore.NewQuery("Uml").Filter("gitHubUrl =", gitHubUrl)
 	keys, err := q.GetAll(ctx, &oldUmls)
 	if err != nil {
 		log.Criticalf(ctx, "failed to fetch old umls: %v", err)
@@ -149,8 +119,13 @@ func (idxr *Indexer) Process() error {
 		}
 	}
 
+	sources := findSources(ctx, text)
 	for _, source := range sources {
 		log.Infof(ctx, "process source: %s", source)
+		if len(source) < MINIMUM_UML_SOURCE_LENGTH {
+			log.Infof(ctx, "under minimum length: length=%d", len(source))
+			continue
+		}
 
 		hash := sha256.Sum256([]byte(source))
 		sourceHash := hex.EncodeToString(hash[:])
@@ -195,7 +170,7 @@ func (idxr *Indexer) Process() error {
 
 		log.Infof(ctx, "make index: type=%s, svg=%s, pngBase64=%s, ascii=%s", typ, svg, pngBase64, ascii)
 		uml := &Uml{
-			GitHubUrl:   idxr.GitHubUrl,
+			GitHubUrl:   gitHubUrl,
 			Source:      source,
 			DiagramType: typ,
 			Svg:         svg,
@@ -223,4 +198,23 @@ func (idxr *Indexer) Process() error {
 	}
 
 	return nil
+}
+
+func findSources(ctx context.Context, text string) []string {
+	sources := make([]string, 0)
+	for {
+		startIdx := strings.Index(text, "@startuml")
+		endIdx := strings.Index(text, "@enduml")
+		log.Debugf(ctx, "length:%d, startIdx:%d, endIdx:%d", len(text), startIdx, endIdx)
+		if startIdx == -1 || endIdx == -1 {
+			break
+		}
+		if startIdx < endIdx {
+			source := fmt.Sprintf("%s@enduml", text[startIdx:endIdx])
+			sources = append(sources, source)
+		}
+
+		text = text[(endIdx + len("@enduml")):]
+	}
+	return sources
 }

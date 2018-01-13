@@ -102,14 +102,8 @@ func HandleIndexCreate(w http.ResponseWriter, r *http.Request) {
 	syntaxCheckerBaseUrl := os.Getenv("SYNTAX_CHECKER_BASE_URL")
 	syntaxChecker := NewSyntaxChecker(ctx, syntaxCheckerBaseUrl)
 
-	indexer, err := NewIndexer(ctx, renderer, syntaxChecker, body.Url, content)
-	if err != nil {
-		log.Criticalf(ctx, "Failed to create indexer: %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	err = indexer.Process()
+	indexer := NewIndexer(renderer, syntaxChecker)
+	err = indexer.CreateIndexes(ctx, content, body.Url)
 	if err != nil {
 		log.Criticalf(ctx, "%s", err)
 		w.WriteHeader(http.StatusInternalServerError)
