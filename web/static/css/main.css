@@ -185,7 +185,7 @@ li:nth-child(2n+1) {
 }
 
 footer {
-  height: 40px;
+  height: 45px;
   background-color: #3f51b5;
   color: #fff;
   text-align: center;
@@ -202,8 +202,8 @@ footer {
   text-decoration: none;
   font-weight: bold;
 }
-.footer__twitter {
-  /* padding: 15px 0 0 10px; */
+.footer__contact__github {
+  vertical-align: text-top;
 }
 .footer__license {
   font-style: italic;
