@@ -16,6 +16,7 @@ type Uml struct {
 	ID            int64       `datastore:"-"`
 	GitHubUrl     string      `datastore:"gitHubUrl"`
 	Source        string      `datastore:"source,noindex"`
+	SourceSHA256  string      `datastore:"sourceSHA256"`
 	DiagramType   DiagramType `datastore:"diagramType"`
 	Svg           string      `datastore:"svg,noindex"`
 	SvgViewBox    string      `datastore:"-"`

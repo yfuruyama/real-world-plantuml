@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"strings"
 
@@ -151,7 +152,9 @@ func (idxr *Indexer) Process() error {
 	for _, source := range sources {
 		log.Infof(ctx, "process source: %s", source)
 
-		sourceHash = string(sha256.Sum256([]byte(source)))
+		hash := sha256.Sum256([]byte(source))
+		sourceHash := hex.EncodeToString(hash[:])
+		log.Debugf(ctx, "source hash: %s", sourceHash)
 
 		result, err := syntaxChecker.CheckSyntax(source)
 		if err != nil {

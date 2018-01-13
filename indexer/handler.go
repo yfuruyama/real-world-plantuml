@@ -41,12 +41,6 @@ type PubSubMessage struct {
 func HandleIndexCreate(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
-	if r.Header.Get("X-AppEngine-QueueName") == "" {
-		log.Warningf(ctx, "Request is not from TaskQueue")
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	var body IndexCreateRequestBody
 	if err := decoder.Decode(&body); err != nil {
@@ -197,7 +191,7 @@ func HandleGcsNotification(w http.ResponseWriter, r *http.Request) {
 		}
 
 		task := &taskqueue.Task{
-			Path:    "/index",
+			Path:    "/indexes",
 			Payload: bodyBytes,
 			Header:  header,
 			Method:  "POST",
