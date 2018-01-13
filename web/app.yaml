@@ -11,5 +11,6 @@ handlers:
   static_dir: static
 - url: /robots.txt
   static_files: templates/robots.txt
+  upload: templates/robots.txt
 - url: /.*
   script: _go_app
