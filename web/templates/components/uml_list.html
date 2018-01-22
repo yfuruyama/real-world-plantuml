@@ -1,12 +1,12 @@
 {{define "uml_list"}}
 
-<ul>
+<div class="uml-list">
 {{range .Umls}}
-  <li>
+  <div class="uml-item">
     {{template "uml_item" .}}
-    <div class="uml__detail_link"><a href="/umls/{{ .ID }}">{{ .DiagramType.ToHumanString }} diagram ({{ .ID }})</a></div>
-  </li>
+    <div class="uml__detail_link"><a href="/umls/{{ .ID }}">{{ .DiagramType.ToHumanString | toUpperCase }} DIAGRAM</a></div>
+    <div class="">{{ .ID }}</div>
+  </div>
 {{end}}
-</ul>
 
 {{end}}

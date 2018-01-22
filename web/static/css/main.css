@@ -88,11 +88,6 @@ header {
   color: #822156;
 }
 
-.diagram_type__icon {
-  width: 40px;
-  margin: 0 10px 0 0;
-}
-
 main {
   padding-left: 16px;
   width: 900px;
@@ -102,8 +97,18 @@ main {
   /* overflow: auto; */
 }
 
+.uml-list {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+.uml-item {
+}
+
 .uml {
   margin: 15px 0 0 0;
+  background-color: #fff;
+  /* width: 300px; */
 }
 .uml__svg {
   display: inline-block;

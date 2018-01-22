@@ -99,6 +99,9 @@ func NewHandler(gaTrackingID string) *Handler {
 			}
 			return re.ReplaceAllString(code, "<mark>$1</mark>")
 		},
+		"toUpperCase": func(word string) string {
+			return strings.ToUpper(word)
+		},
 	}
 
 	return &Handler{
