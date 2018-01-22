@@ -12,13 +12,11 @@
   <link rel="icon" type="image/x-icon" href='{{ staticPath .Context "img/favicon.png" }}'>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/material-components-web@0.27.0/dist/material-components-web.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
   <link rel="stylesheet" href='{{ staticPath .Context "css/main.css" }}'>
 
   <!-- JS -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
-  <script type="text/javascript" src="https://unpkg.com/material-components-web@0.27.0/dist/material-components-web.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-popup-overlay/1.7.9/jquery.popupoverlay.min.js"></script>
   <script async defer src="https://buttons.github.io/buttons.js"></script>
@@ -34,48 +32,64 @@
     gtag('config', '{{.GATrackingID}}');
   </script>
 </head>
-<body class="mdc-typography">
-<header class="mdc-toolbar mdc-toolbar--fixed">
-  <div class="mdc-toolbar__row">
-    <span class="mdc-toolbar__title"><a href="/" class="title">Real World PlantUML</a></span>
-    <form method="GET" action="/search" class="header__search">
-      <input type="text" name="q" placeholder="Search" value="{{ .Query }}">
-    </form>
-  </div>
+<body>
+<header>
+  <div class="title"><a href="/" class="title"><img alt="Real World PlantUML" src="/static/img/logo.png"></a></div>
+  <form method="GET" action="/search" class="header__search">
+    <input type="text" name="q" placeholder="SEARCH" value="{{ .Query }}">
+  </form>
 </header>
 
-<div class="content mdc-toolbar-fixed-adjust">
-  <nav class="mdc-permanent-drawer mdc-typography">
-    <div class="mdc-list-group">
-      <div class="mdc-list-item">Category</div>
-      <hr class="mdc-list-divider">
-      <nav id="icon-with-text-demo" class="mdc-list">
-        <a class='mdc-list-item {{ if eq .DiagramType "sequence" }}diagram_type__selected{{ end }}' href="/?type=sequence">
-          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_sequence.png" }}'>
-          Sequence
+<div class="content">
+  <nav class="category-list">
+    <ul>
+      <li>
+        <a class='category-link' href="/?type=sequence">
+          <div class='category {{ if eq .DiagramType "sequence" }}category--selected{{ end }}'>
+            <div class="category__icon"><img src='{{ staticPath .Context "img/icon_sequence.svg" }}'></div>
+            <div class="category__name">SEQUENCE</div>
+          </div>
         </a>
-        <a class='mdc-list-item {{ if eq .DiagramType "usecase" }}diagram_type__selected{{ end }}' href="/?type=usecase">
-          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_usecase.png" }}'>
-          Usecase
+      </li>
+      <li>
+        <a class='category-link' href="/?type=usecase">
+          <div class='category {{ if eq .DiagramType "usecase" }}category--selected{{ end }}'>
+            <img class="category__icon" src='{{ staticPath .Context "img/icon_usecase.svg" }}'>
+            <span class="category__name">USECASE</span>
+          </div>
         </a>
-        <a class='mdc-list-item {{ if eq .DiagramType "class" }}diagram_type__selected{{ end }}' href="/?type=class">
-          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_class.png" }}'>
-          Class
+      </li>
+        <a class='category-link' href="/?type=class">
+          <div class='category {{ if eq .DiagramType "class" }}category--selected{{ end }}'>
+            <img class="category__icon" src='{{ staticPath .Context "img/icon_class.svg" }}'>
+            <span class="category__name">CLASS</span>
+          </div>
         </a>
-        <a class='mdc-list-item {{ if eq .DiagramType "activity" }}diagram_type__selected{{ end }}' href="/?type=activity">
-          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_activity.png" }}'>
-          Activity
+      <li>
+        <a class='category-link' href="/?type=activity">
+          <div class='category {{ if eq .DiagramType "activity" }}category--selected{{ end }}'>
+            <img class="category__icon" src='{{ staticPath .Context "img/icon_activity.svg" }}'>
+            <span class="category__name">ACTIVITY</span>
+          </div>
         </a>
-        <a class='mdc-list-item {{ if eq .DiagramType "component" }}diagram_type__selected{{ end }}' href="/?type=component">
-          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_component.png" }}'>
-          Component
+      </li>
+      <li>
+        <a class='category-link' href="/?type=component">
+          <div class='category {{ if eq .DiagramType "component" }}category--selected{{ end }}'>
+            <img class="category__icon" src='{{ staticPath .Context "img/icon_component.svg" }}'>
+            <span class="category__name">COMPONENT</span>
+          </div>
         </a>
-        <a class='mdc-list-item {{ if eq .DiagramType "state" }}diagram_type__selected{{ end }}' href="/?type=state">
-          <img class="diagram_type__icon" src='{{ staticPath .Context "img/icons_state.png" }}'>
-          State
+      </li>
+      <li>
+        <a class='category-link' href="/?type=state">
+          <div class='category {{ if eq .DiagramType "state" }}category--selected{{ end }}'>
+            <img class="category__icon" src='{{ staticPath .Context "img/icon_state.svg" }}'>
+            <span class="category__name">STATE</span>
+          </div>
         </a>
-      </nav>
-    </div>
+      </li>
+    </ul>
   </nav>
 
   <main>
@@ -86,15 +100,15 @@
 
 </div>
 
-<footer>
-  <div class="footer__contact">
-    Created and maintained by <a href="https://twitter.com/addsict" target="_blank">Yuki Furuyama</a>
-    <span class="footer__contact__github">
-      <a class="github-button" href="https://github.com/addsict/real-world-plantuml" data-show-count="true" aria-label="Star addsict/real-world-plantuml on GitHub">Star</a>
-    </span>
-  </div>
-  <div class="footer__license">All umls listed in the site are belong to original authors.</div>
-</footer>
+<!-- <footer> -->
+  <!-- <div class="footer__contact"> -->
+    <!-- Created and maintained by <a href="https://twitter.com/addsict" target="_blank">Yuki Furuyama</a> -->
+    <!-- <span class="footer__contact__github"> -->
+      <!-- <a class="github-button" href="https://github.com/addsict/real-world-plantuml" data-show-count="true" aria-label="Star addsict/real-world-plantuml on GitHub">Star</a> -->
+    <!-- </span> -->
+  <!-- </div> -->
+  <!-- <div class="footer__license">All umls listed in the site are belong to original authors.</div> -->
+<!-- </footer> -->
 
 </body>
 </html>{{end}}

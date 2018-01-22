@@ -13,26 +13,33 @@ body {
   position: relative;
   min-height: 100%;
   /* height: 100% */
+
+  background-color: #f4f5f6;
+  padding: 20px 30px 20px 30px;
+}
+
+header {
+  height: 100px;
 }
 
 .title {
-  text-decoration: inherit;
-  color: inherit;
+  /* text-decoration: inherit; */
+  color: #822156;
+  display: inline-block;
 }
 
 .header__search {
-  position: fixed;
-  left: 50%;
-  margin-left: -200px;
+  text-align: right;
 }
 .header__search>input {
-  border-radius: 3px;
+  border-radius: 20px;
   border: none;
-  background-color: #303AA5;
+  /* background-color: #303AA5; */
   height: 30px;
-  padding: 0 0 0 10px;
-  width: 400px;
-  color: #fff;
+  padding: 0 0 0 20px;
+  width: 300px;
+  color: #888;
+  font-size: 13px;
 }
 
 /* Place drawer and main next to each other. */
@@ -43,6 +50,49 @@ body {
   box-sizing: border-box;
 }
 
+.category-list>ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+
+.category-link {
+  text-decoration: none;
+}
+.category {
+  /* display: table-cell; */
+  /* vertical-align: middle; */
+  background-color: #fff;
+  border-radius: 30px;
+  border: none;
+  width: 200px;
+  height: 50px;
+  margin: 0 0 10px 0;
+  padding: 5px 0 0 20px;
+  color: #888;
+}
+.category__icon {
+  display: inline-block;
+}
+.category__name {
+  font-size: 14px;
+  height: 40px;
+  display: inline-block;
+  margin: 0 0 0 15px;
+  /* line-height: 40px; */
+  /* font-weight: bold; */
+}
+.category--selected {
+  border: 2px solid #822156;
+  color: #822156;
+}
+
+.diagram_type__icon {
+  width: 40px;
+  margin: 0 10px 0 0;
+}
+
 main {
   padding-left: 16px;
   width: 900px;
@@ -50,14 +100,6 @@ main {
   margin: 0 0 60px 0;
   /* height: 100%; */
   /* overflow: auto; */
-}
-
-.diagram_type__selected {
-  background-color: #ededed;
-}
-.diagram_type__icon {
-  width: 40px;
-  margin: 0 10px 0 0;
 }
 
 .uml {
@@ -170,15 +212,9 @@ main {
   color: #950029;
 }
 
-ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-li {
-  border-bottom: 1px solid #ccc;
-}
+/* li { */
+  /* border-bottom: 1px solid #ccc; */
+/* } */
 
 li:nth-child(2n+1) {
 	/* background-color: #fafafa; */
