@@ -4,8 +4,8 @@
 {{range .Umls}}
   <div class="uml-item">
     {{template "uml_item" .}}
-    <div class="uml__detail_link"><a href="/umls/{{ .ID }}">{{ .DiagramType.ToHumanString | toUpperCase }} DIAGRAM</a></div>
-    <div class="">{{ .ID }}</div>
+    <div class="uml__category">{{ .DiagramType.ToHumanString | toUpperCase }} DIAGRAM</div>
+    <div class="uml__id">{{ .ID }}</div>
   </div>
 {{end}}
 
