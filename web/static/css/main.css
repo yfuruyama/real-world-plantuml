@@ -1,9 +1,7 @@
-/* Ensure layout covers the entire screen. */
 html {
   height: 100%;
 }
 
-/* Stack toolbar and content on top of each other. */
 body {
   display: flex;
   flex-direction: column;
@@ -12,18 +10,18 @@ body {
   box-sizing: border-box;
   position: relative;
   min-height: 100%;
-  /* height: 100% */
-
   background-color: #f4f5f6;
   padding: 20px 30px 20px 30px;
 }
 
 header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 30px;
   height: 100px;
 }
 
 .title {
-  /* text-decoration: inherit; */
   color: #822156;
   display: inline-block;
 }
@@ -34,7 +32,6 @@ header {
 .header__search>input {
   border-radius: 20px;
   border: none;
-  /* background-color: #303AA5; */
   height: 30px;
   padding: 0 0 0 20px;
   width: 300px;
@@ -42,7 +39,6 @@ header {
   font-size: 13px;
 }
 
-/* Place drawer and main next to each other. */
 .content {
   display: flex;
   flex: 1 1 auto;
@@ -56,13 +52,10 @@ header {
   padding: 0;
 }
 
-
 .category-link {
   text-decoration: none;
 }
 .category {
-  /* display: table-cell; */
-  /* vertical-align: middle; */
   background-color: #fff;
   border-radius: 30px;
   border: none;
@@ -80,8 +73,6 @@ header {
   height: 40px;
   display: inline-block;
   margin: 0 0 0 15px;
-  /* line-height: 40px; */
-  /* font-weight: bold; */
 }
 .category--selected {
   border: 1px solid #822156;
@@ -98,7 +89,6 @@ main {
 
 .container {
   margin: 0 0 0 40px;
-  /* margin: 0 0 100px 0; */
 }
 
 .uml-list {
@@ -131,67 +121,93 @@ main {
   padding: 10px;
   vertical-align: top;
 }
-.uml__svg__modal__wrapper {
+
+/*********
+ * modal *
+ *********/
+.uml__modal__container {
+  background-color: #fff;
+  border-radius: 10px;
+  border: none;
+  padding: 30px;
+}
+.uml__modal__header {
+}
+.uml__modal__header__category {
+  font-size: 14px;
+  color: #950029;
+}
+.uml__modal__header__id {
+  color: #999;
+  font-size: 12px;
+}
+.uml__modal__body {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+.uml__modal__body__svg {
   padding: 20px;
   background-color: #fff;
+  display: inline-box;
 }
-.uml__source {
+.uml__modal__body__source {
   display: inline-block;
   margin: 0 0 0 20px;
   width: 500px;
-  /* height: 300px; */
-  border: 1px solid #999;
 }
-.uml__source__header {
+.uml__modal__body__source__header {
   position: relative;
   height: 20px;
   padding: 5px 0 5px 10px;
   font-size: 14px;
-  background-color: #efefef;
-  border-bottom: 1px solid #999;
+  background-color: #bcb7b7;
 }
-.uml__source__header__ref a {
+.uml__modal__body__source__header__octocat {
+  width: 20px;
+}
+.uml__modal__body__source__header__ref {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 0 0 5px;
+}
+.uml__modal__body__source__header__ref>a {
   color: #555;
   text-decoration: none;
 }
-.uml__source__header__copy {
+.uml__modal__body__source__header__copy {
   position: absolute;
-  top: 0px;
-  right: 0px;
-  background-color: #888;
-  color: #fff;
-  border-left: 1px solid #999;
-  border-bottom: none;
-  border-top: none;
-  border-right: none;
+  top: 2px;
+  right: 5px;
+  background-color: #bcb7b7;
+  color: #333;
+  border: 2px solid #fff;
+  border-radius: 20px;
   padding: 2px 10px 4px 10px;
-  height: 100%;
+  height: 25px;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
 }
-.uml__source__content {
+.uml__modal__body__source__content {
   position: relative;
-  height: 280px;
   font-size: 12px;
-  /* background-color: #efefef; */
-  color: #333;
+  color: #8d8888;
   padding: 5px 10px 10px 30px;
   margin: 0 0 0 0;
-  /* white-space: pre-wrap; */
   white-space: pre;
   overflow: auto;
+  background-color: #efefef;
 }
 /* cf. https://qiita.com/Ria0130/items/b49b13e4ff935993c813 */
-.uml__source__content__line_numbers {
+.uml__modal__body__source__content__line_numbers {
   display: block;
   position: absolute;
   pointer-events: none;
   top: 5px;
   font-size: 100%;
-  /* font-size: 12px; */
   left: -20px;
   width: 50px;
   letter-spacing: -1px;
@@ -200,18 +216,19 @@ main {
   -moz-user-select: none;
   -ms-user-select: none;
 }
-.uml__source__content__line_numbers>span {
+.uml__modal__body__source__content__line_numbers>span {
   pointer-events: none;
   display: block;
   counter-increment: linenumber;
 }
-.uml__source__content__line_numbers>span:before {
+.uml__modal__body__source__content__line_numbers>span:before {
   content: counter(linenumber);
-  color: #999;
+  color: #aaa;
   display: block;
   padding-right: .8em;
   text-align: right;
 }
+
 .uml__category {
   margin: 5px 0 0 0;
   font-size: 14px;
@@ -222,14 +239,9 @@ main {
   font-size: 12px;
 }
 
-/* li { */
-  /* border-bottom: 1px solid #ccc; */
-/* } */
-
-li:nth-child(2n+1) {
-	/* background-color: #fafafa; */
-}
-
+/**********
+ * footer *
+ **********/
 footer {
   height: 45px;
   background-color: #aaa;
