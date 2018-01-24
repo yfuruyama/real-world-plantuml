@@ -4,7 +4,7 @@
   {{template "uml_list" .}}
 
   {{if .NextCursor}}
-    <div><a href="/search?q={{ .Query }}&cursor={{ .NextCursor }}">Next</a></div>
+    <div class="next_link"><a href="/search?q={{ .Query }}&cursor={{ .NextCursor }}">Next</a></div>
   {{end}}
 {{else}}
   <div class="error">

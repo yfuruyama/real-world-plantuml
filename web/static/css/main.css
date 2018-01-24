@@ -13,7 +13,6 @@ body {
   background-color: #f4f5f6;
   font-family: "Avenir Next", Verdana, Meiryo, Osaka, sans-serif;
   font-weight: 500;
-  /*padding: 20px 30px 20px 30px;*/
 }
 
 header {
@@ -146,8 +145,6 @@ main {
   grid-gap: 20px;
   grid-template-columns: repeat(auto-fit, 340px);
 }
-.uml-item {
-}
 
 .uml {
   background: #FFFFFF;
@@ -195,12 +192,12 @@ main {
 .uml__modal__body {
   display: grid;
   grid-gap: 10px;
-  grid-template-columns: 1fr 1fr;
+  /* grid-template-columns: 1fr 1fr; */
+  grid-template-columns: auto 530px;
 }
 .uml__modal__body__svg {
   padding: 20px;
   background-color: #fff;
-  display: inline-box;
 }
 .uml__modal__body__source {
   display: inline-block;
@@ -304,6 +301,14 @@ main {
   color: #8B8B8B;
   font-size: 12px;
   padding-top: 4px;
+}
+
+.next_link {
+  margin: 40px 0 30px 0;
+  width: 100px;
+}
+.next_link>a {
+  color: #950029;
 }
 
 /**********

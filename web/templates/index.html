@@ -3,7 +3,7 @@
 {{template "uml_list" .}}
 
 {{ if .NextCursor }}
-  <div><a href="/?cursor={{ .NextCursor }}{{ if .DiagramType }}&type={{ .DiagramType }}{{ end }}">Next</a></div>
+  <div class="next_link"><a href="/?cursor={{ .NextCursor }}{{ if .DiagramType }}&type={{ .DiagramType }}{{ end }}">Next</a></div>
 {{ end }}
 
 {{ end }}

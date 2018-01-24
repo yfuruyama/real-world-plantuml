@@ -15,7 +15,7 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-const NUM_OF_ITEMS_PER_PAGE = 10
+const NUM_OF_ITEMS_PER_PAGE = 20
 
 type CommonTemplateVars struct {
 	GATrackingID string
@@ -43,7 +43,6 @@ func (h *Handler) ToHandlerFunc(handle func(w http.ResponseWriter, r *http.Reque
 			log.Criticalf(ctx, "%s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 
-			// TODO: マークアップが安定してきたら外に出す
 			tmpl := template.Must(template.New("").Funcs(h.FuncMap).ParseFiles(
 				"templates/base.html",
 				"templates/500.html",
@@ -123,7 +122,6 @@ func (h *Handler) GetIndex(w http.ResponseWriter, r *http.Request) error {
 	}
 	log.Debugf(ctx, "next cursor: %s", nextCursor)
 
-	// TODO: マークアップが安定してきたら外に出す
 	tmpl := template.Must(template.New("").Funcs(h.FuncMap).ParseFiles(
 		"templates/base.html",
 		"templates/index.html",
@@ -163,7 +161,6 @@ func (h *Handler) GetSearch(w http.ResponseWriter, r *http.Request) error {
 	}
 	log.Debugf(ctx, "next cursor: %s", nextCursor)
 
-	// TODO: マークアップが安定してきたら外に出す
 	tmpl := template.Must(template.New("").Funcs(h.FuncMap).ParseFiles(
 		"templates/base.html",
 		"templates/search.html",
@@ -208,7 +205,6 @@ func (h *Handler) GetUml(w http.ResponseWriter, r *http.Request) error {
 	// insert to 1st position
 	umls = append([]*Uml{uml}, umls...)
 
-	// TODO: マークアップが安定してきたら外に出す
 	tmpl := template.Must(template.New("").Funcs(h.FuncMap).ParseFiles(
 		"templates/base.html",
 		"templates/index.html",
@@ -235,7 +231,6 @@ func (h *Handler) NotFound(w http.ResponseWriter, r *http.Request) error {
 	ctx := appengine.NewContext(r)
 	w.WriteHeader(http.StatusNotFound)
 
-	// TODO: マークアップが安定してきたら外に出す
 	tmpl := template.Must(template.New("").Funcs(h.FuncMap).ParseFiles(
 		"templates/base.html",
 		"templates/404.html",
