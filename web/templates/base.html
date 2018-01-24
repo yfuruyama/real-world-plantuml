@@ -12,7 +12,6 @@
   <link rel="icon" type="image/x-icon" href='{{ staticPath .Context "img/favicon.png" }}'>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
   <link rel="stylesheet" href='{{ staticPath .Context "css/main.css" }}'>
 
   <!-- JS -->
@@ -36,7 +35,7 @@
 <header>
   <div class="header_inner">
     <div class="title">
-      <a href="/"><img alt="Real World PlantUML" src="static/img/logo.png" height="14" width="205"></a>
+      <a href="/"><img alt="Real World PlantUML" src='{{ staticPath .Context "img/logo.png" }}' height="14" width="205"></a>
     </div>
     <div class="search_form">
       <form method="GET" action="/search" class="header_search">

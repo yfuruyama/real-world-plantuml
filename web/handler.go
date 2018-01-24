@@ -128,7 +128,6 @@ func (h *Handler) GetIndex(w http.ResponseWriter, r *http.Request) error {
 		"templates/base.html",
 		"templates/index.html",
 		"templates/components/uml_list.html",
-		"templates/components/uml_item.html",
 	))
 
 	err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
@@ -169,7 +168,6 @@ func (h *Handler) GetSearch(w http.ResponseWriter, r *http.Request) error {
 		"templates/base.html",
 		"templates/search.html",
 		"templates/components/uml_list.html",
-		"templates/components/uml_item.html",
 	))
 
 	err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
@@ -201,22 +199,30 @@ func (h *Handler) GetUml(w http.ResponseWriter, r *http.Request) error {
 		return h.NotFound(w, r)
 	}
 
+	umls, nextCursor, err := FetchUmls(ctx, "", NUM_OF_ITEMS_PER_PAGE, "")
+	if err != nil {
+		return err
+	}
+	log.Debugf(ctx, "next cursor: %s", nextCursor)
+
+	// insert to 1st position
+	umls = append([]*Uml{uml}, umls...)
+
 	// TODO: マークアップが安定してきたら外に出す
 	tmpl := template.Must(template.New("").Funcs(h.FuncMap).ParseFiles(
 		"templates/base.html",
-		"templates/uml.html",
-		"templates/components/uml_item.html",
+		"templates/index.html",
+		"templates/components/uml_list.html",
 	))
 
-	err = tmpl.ExecuteTemplate(w, "base", struct {
-		*CommonTemplateVars
-		Uml Uml
-	}{
+	err = tmpl.ExecuteTemplate(w, "base", UmlListTemplateVars{
 		CommonTemplateVars: &CommonTemplateVars{
 			GATrackingID: h.GATrackingID,
 			Context:      ctx,
+			DiagramType:  "",
 		},
-		Uml: *uml,
+		Umls:       umls,
+		NextCursor: nextCursor,
 	})
 	if err != nil {
 		return err
