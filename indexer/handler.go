@@ -55,7 +55,7 @@ func HandleIndexCreate(w http.ResponseWriter, r *http.Request) {
 	matched := re.FindStringSubmatch(body.Url)
 	if len(matched) != 5 {
 		log.Warningf(ctx, "invalid github url")
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
