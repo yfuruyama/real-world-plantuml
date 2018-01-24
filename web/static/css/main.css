@@ -13,6 +13,7 @@ body {
   background-color: #f4f5f6;
   font-family: "Avenir Next", Verdana, Meiryo, Osaka, sans-serif;
   font-weight: 500;
+  overflow-y: scroll; /* always show scroll because of https://q-az.net/appear-scrollbar-problem/ */
 }
 
 header {
