@@ -34,70 +34,78 @@
 </head>
 <body>
 <header>
-  <div class="title"><a href="/" class="title"><img alt="Real World PlantUML" src="/static/img/logo.png"></a></div>
-  <form method="GET" action="/search" class="header__search">
-    <input type="text" name="q" placeholder="SEARCH" value="{{ .Query }}">
-  </form>
+  <div class="header_inner">
+    <div class="title">
+      <a href="/"><img alt="Real World PlantUML" src="static/img/logo.png" height="14" width="205"></a>
+    </div>
+    <div class="search_form">
+      <form method="GET" action="/search" class="header_search">
+        <input type="text" name="q" placeholder="SEARCH" value="">
+      </form>
+    </div>
+  </div>
 </header>
 
-<div class="content">
-  <nav class="category-list">
-    <ul>
-      <li>
-        <a class='category-link' href="/?type=sequence">
-          <div class='category {{ if eq .DiagramType "sequence" }}category--selected{{ end }}'>
-            <div class="category__icon"><img src='{{ staticPath .Context "img/icon_sequence.svg" }}'></div>
-            <div class="category__name">SEQUENCE</div>
-          </div>
-        </a>
-      </li>
-      <li>
-        <a class='category-link' href="/?type=usecase">
-          <div class='category {{ if eq .DiagramType "usecase" }}category--selected{{ end }}'>
-            <img class="category__icon" src='{{ staticPath .Context "img/icon_usecase.svg" }}'>
-            <span class="category__name">USECASE</span>
-          </div>
-        </a>
-      </li>
-        <a class='category-link' href="/?type=class">
-          <div class='category {{ if eq .DiagramType "class" }}category--selected{{ end }}'>
-            <img class="category__icon" src='{{ staticPath .Context "img/icon_class.svg" }}'>
-            <span class="category__name">CLASS</span>
-          </div>
-        </a>
-      <li>
-        <a class='category-link' href="/?type=activity">
-          <div class='category {{ if eq .DiagramType "activity" }}category--selected{{ end }}'>
-            <img class="category__icon" src='{{ staticPath .Context "img/icon_activity.svg" }}'>
-            <span class="category__name">ACTIVITY</span>
-          </div>
-        </a>
-      </li>
-      <li>
-        <a class='category-link' href="/?type=component">
-          <div class='category {{ if eq .DiagramType "component" }}category--selected{{ end }}'>
-            <img class="category__icon" src='{{ staticPath .Context "img/icon_component.svg" }}'>
-            <span class="category__name">COMPONENT</span>
-          </div>
-        </a>
-      </li>
-      <li>
-        <a class='category-link' href="/?type=state">
-          <div class='category {{ if eq .DiagramType "state" }}category--selected{{ end }}'>
-            <img class="category__icon" src='{{ staticPath .Context "img/icon_state.svg" }}'>
-            <span class="category__name">STATE</span>
-          </div>
-        </a>
-      </li>
-    </ul>
-  </nav>
+<div class="content-holder">
+  <div class="content">
+    <nav class="category-list">
+      <ul>
+        <li>
+          <a class='category-link' href="/?type=sequence">
+            <div class='category {{ if eq .DiagramType "sequence" }}category--selected{{ end }}'>
+              <img class="category__icon" src='{{ staticPath .Context "img/icon_sequence.svg" }}'>
+              <div class="category__name">SEQUENCE</div>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a class='category-link' href="/?type=usecase">
+            <div class='category {{ if eq .DiagramType "usecase" }}category--selected{{ end }}'>
+              <img class="category__icon" src='{{ staticPath .Context "img/icon_usecase.svg" }}'>
+              <div class="category__name">USECASE</div>
+            </div>
+          </a>
+        </li>
+          <a class='category-link' href="/?type=class">
+            <div class='category {{ if eq .DiagramType "class" }}category--selected{{ end }}'>
+              <img class="category__icon" src='{{ staticPath .Context "img/icon_class.svg" }}'>
+              <div class="category__name">CLASS</div>
+            </div>
+          </a>
+        <li>
+          <a class='category-link' href="/?type=activity">
+            <div class='category {{ if eq .DiagramType "activity" }}category--selected{{ end }}'>
+              <img class="category__icon" src='{{ staticPath .Context "img/icon_activity.svg" }}'>
+              <div class="category__name">ACTIVITY</div>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a class='category-link' href="/?type=component">
+            <div class='category {{ if eq .DiagramType "component" }}category--selected{{ end }}'>
+              <img class="category__icon" src='{{ staticPath .Context "img/icon_component.svg" }}'>
+              <div class="category__name">COMPONENT</div>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a class='category-link' href="/?type=state">
+            <div class='category {{ if eq .DiagramType "state" }}category--selected{{ end }}'>
+              <img class="category__icon" src='{{ staticPath .Context "img/icon_state.svg" }}'>
+              <div class="category__name">STATE</div>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
 
-  <main>
-    <div class="container">
-      {{template "content" .}}
-    </div>
-  </main>
+    <main>
+      <div class="container">
+        {{template "content" .}}
+      </div>
+    </main>
 
+  </div>
 </div>
 
 <footer>
