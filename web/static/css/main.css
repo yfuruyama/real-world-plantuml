@@ -245,22 +245,16 @@ main {
   -ms-user-select: none;
   box-shadow: 0 2px 9px 0 rgba(0,0,0,0.26);
 }
-
 .uml__modal__body__source__content {
   position: relative;
   font-size: 12px;
   font-weight: 100;
   color: #675A5A;
   padding: 10px 20px 20px 40px;
-  height: 410px;
   margin: 0;
   white-space: pre;
   overflow: auto;
   background-color: #efefef;
-}
-
-.uml_modal_body_source_container {
-
 }
 
 /* cf. https://qiita.com/Ria0130/items/b49b13e4ff935993c813 */
