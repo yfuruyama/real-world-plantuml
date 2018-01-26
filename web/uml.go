@@ -45,7 +45,7 @@ func (d DiagramType) ToHumanString() string {
 	case TypeSequence:
 		return "Sequence"
 	case TypeUsecase:
-		return "Usecase"
+		return "Use case"
 	case TypeClass:
 		return "Class"
 	case TypeActivity:
