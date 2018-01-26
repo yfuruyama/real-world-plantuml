@@ -144,7 +144,7 @@ main {
 .uml-list {
   display: grid;
   grid-gap: 20px;
-  grid-template-columns: repeat(auto-fit, 340px);
+  grid-template-columns: repeat(auto-fit, 220px);
 }
 
 .uml {
@@ -157,12 +157,12 @@ main {
   display: inline-block;
   padding: 10px;
   vertical-align: top;
-  width: 320px;
+  width: 200px;
   cursor: pointer;
 }
 .uml__svg__wrapper {
-  width: 320px;
-  height: 320px;
+  width: 200px;
+  height: 200px;
 }
 .uml__svg--raw {
   display: inline-block;

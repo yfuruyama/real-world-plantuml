@@ -15,7 +15,7 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-const NUM_OF_ITEMS_PER_PAGE = 20
+const NUM_OF_ITEMS_PER_PAGE = 21
 
 type CommonTemplateVars struct {
 	GATrackingID string
