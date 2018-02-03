@@ -14,6 +14,7 @@ func init() {
 	handler := NewHandler(gaTrackingId)
 
 	router := chi.NewRouter()
+	router.Get("/_ah/warmup", handler.ToHandlerFunc(handler.Warmup))
 	router.Get("/", handler.ToHandlerFunc(handler.GetIndex))
 	router.Get("/search", handler.ToHandlerFunc(handler.GetSearch))
 	router.Get("/umls/{umlID:\\d+}", handler.ToHandlerFunc(handler.GetUml))

@@ -2,11 +2,16 @@ runtime: go
 api_version: go1
 instance_class: F1
 service: default
+inbound_services:
+- warmup
 automatic_scaling:
 env_variables:
   GA_TRACKING_ID: {{.GA_TRACKING_ID}}
 
 handlers:
+- url: /_ah/warmup
+  script: _go_app
+  login: admin
 - url: /static
   static_dir: static
 - url: /robots.txt

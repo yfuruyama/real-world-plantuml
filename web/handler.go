@@ -109,6 +109,11 @@ func NewHandler(gaTrackingID string) *Handler {
 	}
 }
 
+func (h *Handler) Warmup(w http.ResponseWriter, r *http.Request) error {
+	fmt.Fprintf(w, "ok")
+	return nil
+}
+
 func (h *Handler) GetIndex(w http.ResponseWriter, r *http.Request) error {
 	ctx := appengine.NewContext(r)
 
