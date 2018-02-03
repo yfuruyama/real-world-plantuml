@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/go-chi/chi"
+
+	"google.golang.org/appengine"
 )
 
 func init() {
@@ -16,6 +18,11 @@ func init() {
 	router.Get("/search", handler.ToHandlerFunc(handler.GetSearch))
 	router.Get("/umls/{umlID:\\d+}", handler.ToHandlerFunc(handler.GetUml))
 	router.NotFound(handler.ToHandlerFunc(handler.NotFound))
+
+	// for debugging
+	if appengine.IsDevAppServer() {
+		router.Get("/debug/dummy_uml", handler.ToHandlerFunc(handler.DebugRegisterDummyUml))
+	}
 
 	http.Handle("/", router)
 }

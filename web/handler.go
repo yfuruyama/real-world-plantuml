@@ -246,3 +246,13 @@ func (h *Handler) NotFound(w http.ResponseWriter, r *http.Request) error {
 
 	return nil
 }
+
+func (h *Handler) DebugRegisterDummyUml(w http.ResponseWriter, r *http.Request) error {
+	ctx := appengine.NewContext(r)
+	err := RegisterDummyUml(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(w, "done")
+	return nil
+}

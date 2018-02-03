@@ -17,6 +17,8 @@ Run server
 make run GA_TRACKING_ID=${GA_TRACKING_ID}
 ```
 
+Register dummy UML: access to `/debug/dummy_uml` in your browser
+
 ### indexer
 
 Run server
