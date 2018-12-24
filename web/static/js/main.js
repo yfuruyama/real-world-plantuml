@@ -33,6 +33,11 @@ $(document).ready(function() {
     });
   });
 
+  // workaround for https://github.com/yfuruyama/real-world-plantuml/issues/2
+  $('.popup_wrapper').each(function(i, elem) {
+    elem.style.display = '';
+  });
+
   // keyboard shortcut
   document.onkeydown = function(e) {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
