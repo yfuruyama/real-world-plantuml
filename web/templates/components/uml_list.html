@@ -21,7 +21,7 @@
                 <div class="uml__modal__body__source__header__ref"><a href="{{ .GitHubUrl }}" target="_blank">{{ .GitHubUrl | githubUrlToAnchorText }}</a></div>
                 <button class="uml__modal__body__source__header__copy" data-clipboard-text="{{ .Source }}">COPY</button>
               </div>
-              <pre class="uml__modal__body__source__content">{{ .Source | html | highlight .HighlightWord }}<span class="uml__modal__body__source__content__line_numbers">{{ range loopLineTimes .Source }}<span></span>{{ end }}</span></pre>
+              <pre class="uml__modal__body__source__content">{{ .Source | highlight .HighlightWord }}<span class="uml__modal__body__source__content__line_numbers">{{ range loopLineTimes .Source }}<span></span>{{ end }}</span></pre>
             </div>
           </div>
         </div>
