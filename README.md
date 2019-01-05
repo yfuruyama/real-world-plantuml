@@ -5,7 +5,7 @@ Source code of https://real-world-plantuml.com/
 
 ## Architecture
 
-<img alt="architecture" src="https://github.com/addsict/real-world-plantuml/blob/master/docs/architecture.png" width="700">
+<img alt="architecture" src="https://github.com/yfuruyama/real-world-plantuml/blob/master/docs/architecture.png" width="700">
 
 ## For development
 

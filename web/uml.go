@@ -215,7 +215,7 @@ func fetchUmlsByIds(ctx context.Context, ids []int64) ([]*Uml, error) {
 
 func RegisterDummyUml(ctx context.Context) error {
 	uml := &Uml{
-		GitHubUrl: "https://github.com/addsict/real-world-plantuml/blob/master/README.md",
+		GitHubUrl: "https://github.com/yfuruyama/real-world-plantuml/blob/master/README.md",
 		Source: `@startuml
 Alice -> Bob: Authentication Request
 Bob --> Alice: Authentication Response
