@@ -1,4 +1,4 @@
-package web
+package main
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"google.golang.org/appengine"
 )
 
-func init() {
+func main() {
 	gaTrackingId := os.Getenv("GA_TRACKING_ID")
 	handler := NewHandler(gaTrackingId)
 
@@ -26,4 +26,6 @@ func init() {
 	}
 
 	http.Handle("/", router)
+
+	appengine.Main()
 }

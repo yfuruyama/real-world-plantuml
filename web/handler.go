@@ -1,10 +1,11 @@
-package web
+package main
 
 import (
 	"context"
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -86,7 +87,7 @@ func NewHandler(gaTrackingID string) *Handler {
 			return text
 		},
 		"staticPath": func(ctx context.Context, filePath string) string {
-			return fmt.Sprintf("/static/%s?v=%s", filePath, appengine.VersionID(ctx))
+			return fmt.Sprintf("/static/%s?v=%s", filePath, os.Getenv("GAE_VERSION"))
 		},
 		"highlight": func(word, code string) string {
 			if word == "" {

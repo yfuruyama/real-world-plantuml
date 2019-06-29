@@ -1,4 +1,4 @@
-package web
+package main
 
 import (
 	"context"

@@ -1,6 +1,7 @@
 PORT=8080
 API_PORT=8081
 ADMIN_PORT=8082
+DATASTORE_PORT=8083
 
 all:
 	test
@@ -8,10 +9,11 @@ all:
 test:
 	echo "TBD"
 
+run-datastore:
+	gcloud beta emulators datastore start --host-port=localhost:$(DATASTORE_PORT)
+
 run:
-	GA_TRACKING_ID=$(GA_TRACKING_ID) go run ../util/gen_app_yaml.go --in app.yaml --out app.dist.yaml
-	dev_appserver.py --logs_path=/tmp/log_web.db --storage_path=/tmp/storage.db --search_indexes_path=/tmp/search.db --clear_search_indexes=false --port=$(PORT) --api_port=$(API_PORT) --admin_port=$(ADMIN_PORT) app.dist.yaml
+	dev_appserver.py --datastore_emulator_port=$(DATASTORE_PORT) --logs_path=/tmp/log_web.db --search_indexes_path=/tmp/search.db --clear_search_indexes=false --port=$(PORT) --api_port=$(API_PORT) --admin_port=$(ADMIN_PORT) app.yaml
 
 deploy:
-	GA_TRACKING_ID=$(GA_TRACKING_ID) go run ../util/gen_app_yaml.go --in app.yaml --out app.dist.yaml
-	gcloud --project=$(PROJECT) app deploy app.dist.yaml --version=$(VERSION)
+	gcloud --project=$(PROJECT) app deploy app.yaml --version=$(VERSION)
