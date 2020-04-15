@@ -1,0 +1,36 @@
+    @startuml
+        skinparam note {
+            BackgroundColor White
+            FontColor Black
+        }
+
+        :Optical system: as os
+        :Host controller: as host
+
+        rectangle "Trace RAM" as tram{
+        }
+
+        rectangle "CPU RAM" as cram{
+        }
+
+        note as adc
+            1
+            --
+            Analog to Digital Converter
+            --
+        end note
+
+        note as tp
+            2
+            --
+            Trace processing
+            --
+        end note
+
+        os .> adc: analog signal
+        adc .> tram: digital signal
+        tram .> tp: raw trace
+        tp .> cram: processed data
+        cram .> host: SPI packet
+
+    @enduml
