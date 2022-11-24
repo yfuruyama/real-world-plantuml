@@ -5,7 +5,7 @@ digraph G {
   compound="true"
   couple(parents0,"Parents","#dfdfff",grandpa,Father,grandma,Mother)
   relate(husband,parents0)
-  couple(parents,"Parents","#ffdfdf",father,Father,mother,Mother)
+  couple(parents,"Parents","#ffdfdf",father,Father,mother,Mother,$otherchildren="Peter, Paul")
   relate(wife,parents)
   couple(family,"Family","#dfffdf",husband,Joe,wife,Jill,"#dfdfff","#ffdfdf")
   child(child1,Girl,family,"#dfffdf")
