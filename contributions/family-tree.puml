@@ -1,0 +1,13 @@
+@startuml FamilyTree
+!include https://gitlab.migrandama.com/foss/plantuml-templates/-/raw/main/family-tree.puml
+digraph G {
+  compound="true"
+  couple(parents0,"Parents","#dfdfff",grandpa,Father,grandma,Mother)
+  relate(husband,parents0)
+  couple(parents,"Parents","#ffdfdf",father,Father,mother,Mother)
+  relate(wife,parents)
+  couple(family,"Family","#dfffdf",husband,Joe,wife,Jill,"#dfdfff","#ffdfdf")
+  child(child1,Girl,family,"#dfffdf")
+  child(child2,Boy,family,"#dfffdf")
+}
+@enduml
