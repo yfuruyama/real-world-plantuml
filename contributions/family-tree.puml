@@ -1,4 +1,5 @@
 @startuml FamilyTree
+' family-tree library documented at https://gitlab.migrandama.com/foss/plantuml-templates
 !include https://gitlab.migrandama.com/foss/plantuml-templates/-/raw/main/family-tree.puml
 digraph G {
   compound="true"

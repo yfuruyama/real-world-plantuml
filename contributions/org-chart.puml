@@ -1,4 +1,5 @@
 @startuml OrgChart
+' org-chart library documented at https://gitlab.migrandama.com/foss/plantuml-templates
 !include https://gitlab.migrandama.com/foss/plantuml-templates/-/raw/main/org-chart.puml
 !$managerColor="#503000"
 digraph "org-chart" {
