@@ -1,0 +1,27 @@
+@startuml OrgChart
+' org-chart library documented at https://gitlab.migrandama.com/foss/plantuml-templates
+!include https://gitlab.migrandama.com/foss/plantuml-templates/-/raw/main/org-chart.puml
+!$managerColor="#503000"
+digraph "org-chart" {
+  rankdir="TB" splines="true" overlap="false" nodesep="0.2" ranksep="0.001" fontname="Arial" fontsize="9" style="rounded,filled" fillcolor=white compound="true"
+  edge [penwidth="3.0" color="#00000033" fontname="Arial" fontsize="9" dir=none ]
+  node [color="#f09030" fontcolor="#503000"]
+
+  manager(billr,Bill Rogers,My company,CEO)
+  manager(backfill,"[backfill]",Office of the CTO,CTO,billr,'fillcolor=lightgray color=lightgray   fontcolor="#909090"')
+  individual(donna,Donna Masick,Consultant,backfill)
+  manager(felishia,Felishia Laquish,Engineering,Director,backfill)
+  individual(horace,Horace Smith,Consultant,backfill)
+  manager(karla,Karla Mamani,Design,Manager,felishia,'color="#ffd6a2"',"label=interim style=dashed")
+  manager(cirilo,Cirilo Mann,Build,Manager,felishia)
+  manager(jim,Jim Madison,Run,Manager,felishia)
+  !$designers = {"members":["Jason Miller","Thomas Albretch","Liam Cortez","Boris Cybrinsky","Carlos Rodriguez"]}
+  team(designers,Designers,$designers.members,karla)
+  !$builders = {"members":["Sam Adams","William Trent","John Harding","Clyde Albertson","Violeta Dominique"]}
+  team(builders,Builders,$builders.members,cirilo)
+  !$dc = {"members":["Chris Branson","Naomi Schultz","Brandon Alonso"]}
+  team(dc,Data Center,$dc.members,jim)
+  !$cloud = {"members":["Albert Romero","Sandra Smith"]}
+  team(cloud,Cloud,$cloud.members,jim);
+}
+@enduml
